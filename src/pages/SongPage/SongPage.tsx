@@ -17,9 +17,8 @@ export const SongPage = () => {
     const pre = findedSong?.text;
     setTitle(findedSong?.title);
   
-    let arr = pre?.split("\n");
+    let arr: string[] | undefined = pre?.split("\n");
     setSongArr(arr);
-    console.log(arr)
   }, [id])
 
   return (

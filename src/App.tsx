@@ -30,43 +30,33 @@ const drawerWidth = 240;
 export type NavDraver = 'drawer1' | 'drawer2'
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
-  open?: boolean;
-}>(({ theme, open }) => ({
+  open1?: boolean, open2?: boolean
+}>(({ theme, open1, open2 }) => ({
   flexGrow: 1,
   padding: theme.spacing(3),
+  marginLeft: `${open1 ? drawerWidth : 0}px`,
+  marginRight: `${open2 ? drawerWidth : 0}px`,
   transition: theme.transitions.create('margin', {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  marginLeft: `-${drawerWidth}px`,
-  ...(open && {
-    transition: theme.transitions.create('margin', {
       easing: theme.transitions.easing.easeOut,
       duration: theme.transitions.duration.enteringScreen,
     }),
-    marginLeft: 0,
-  }),
 }));
 
 interface AppBarProps extends MuiAppBarProps {
-  open?: boolean;
+  open1?: boolean;
+  open2?: boolean;
 }
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== 'open',
-})<AppBarProps>(({ theme, open }) => ({
+})<AppBarProps>(({ theme, open1, open2 }) => ({
   transition: theme.transitions.create(['margin', 'width'], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
-  ...(open && {
-    width: `calc(100% - ${drawerWidth}px)`,
-    marginLeft: `${drawerWidth}px`,
-    transition: theme.transitions.create(['margin', 'width'], {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  }),
+  width: `calc(100% - ${open1 || open2 ? drawerWidth : open1 && open2 ? drawerWidth * 2 : 0}px)`,
+  marginLeft: `${open1 ? drawerWidth : 0}px`,
+  marginRight: `${open2 ? drawerWidth : 0}px`,
 }));
 
 const DrawerHeader = styled('div')(({ theme }) => ({
@@ -110,10 +100,10 @@ export default function PersistentDrawerLeft() {
   
       <Drawer
         sx={{
-          width: drawerWidth,
+      
           flexShrink: 0,
           '& .MuiDrawer-paper': {
-            width: drawerWidth,
+            width:  drawerWidth,
             boxSizing: 'border-box',
           },
         }}
@@ -135,7 +125,7 @@ export default function PersistentDrawerLeft() {
         <Divider />
       </Drawer>
 
-      <AppBar position="fixed" open={open1}>
+      <AppBar position="fixed" open1={open1} open2={open2}>
         <Toolbar>
           <IconButton
             color="inherit"
@@ -164,10 +154,10 @@ export default function PersistentDrawerLeft() {
 
       <Drawer
         sx={{
-     
+        
           flexShrink: 0,
           '& .MuiDrawer-paper': {
-      
+            width:  drawerWidth,
             boxSizing: 'border-box',
           },
         }}
@@ -189,7 +179,7 @@ export default function PersistentDrawerLeft() {
         <Divider />
       </Drawer>
       
-      <Main open={open1}>
+      <Main open1={open1} open2={open2}>
         <DrawerHeader />
      <Router></Router>
       </Main>
