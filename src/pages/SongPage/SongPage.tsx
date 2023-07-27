@@ -5,15 +5,18 @@ import { TransposeProvider } from "../../context/TransposeContext";
 import { TransposeControl } from "../../components/TranponseControl/TransposeControl";
 import "./style.scss";
 import { useEffect, useState } from "react";
-import { SongList } from "../../constans/songList";
+import { SongItem, SongList } from "../../constans/songList";
+import { useIndexedDbContext } from "../../context/IndexedDbContext";
 
 export const SongPage = () => {
   const { id } = useParams();
+  const [song, setSong] = useState<SongItem>();
   const [songArr, setSongArr] = useState<string[] | undefined>([]);
   const [title, setTitle] = useState<string | undefined>('');
 
   useEffect(() => {
     const findedSong = SongList.find(song => song.id.toString() === id);
+    setSong(findedSong);
     const pre = findedSong?.text;
     setTitle(findedSong?.title);
   
@@ -22,10 +25,9 @@ export const SongPage = () => {
   }, [id])
 
   return (
-    <TransposeProvider>
       <div className="song">
       <div className="song__title">
-      <TransposeControl></TransposeControl>
+      <TransposeControl song={song}></TransposeControl>
         <p>{title}</p>
         </div>
       <div className="song__items">
@@ -37,11 +39,7 @@ export const SongPage = () => {
           </div>
         ))}
       </div>
-    
       </div>
-
-   
-    </TransposeProvider>
   );
 };
 

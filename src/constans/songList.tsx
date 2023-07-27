@@ -1,11 +1,12 @@
 export type SongItem = {
-    id: number,
+    id: string,
     title: string,
-    text: string
+    text: string,
+    semitones?: number
 }
 
-export const SongList = [{
-    id: 1,
+export const SongList: SongItem[] = [{
+    id: '1',
     title: `jdjdjdjdj`,
     text:   
     `    G C Em        D  
@@ -61,7 +62,7 @@ export const SongList = [{
     
 },
 {
-    id: 2,
+    id: '2',
     title: `jdjdjdj2222dj`,
     text:   
     `    G C Em        D  
@@ -85,7 +86,7 @@ export const SongList = [{
     
 },
 {
-    id: 3,
+    id: '3',
     title: `jdjdjdj2222dj`,
     text:   
     `    G C Em        D  

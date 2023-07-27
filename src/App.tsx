@@ -23,7 +23,9 @@ import HomePage from './pages/HomePage';
 import SongPage from './pages/SongPage/SongPage';
 import Router from './components/router';
 import { NavListItem } from './components/NavListItem/NavListItem';
-import { SongList } from './constans/songList';
+import { SongItem, SongList } from './constans/songList';
+import { useIndexedDbContext } from './context/IndexedDbContext';
+import { useTransposeContext } from './context/TransposeContext';
 
 
 const drawerWidth = 240;
@@ -70,6 +72,8 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 
 export default function PersistentDrawerLeft() {
   const theme = useTheme();
+  const { songList, handleInitDB, addSong, deleteSong, updateSong, getSongList } = useIndexedDbContext();
+  const { semitones } = useTransposeContext();
   const [open1, setOpen1] = React.useState(true);
   const [open2, setOpen2] = React.useState(true);
   const navigate = useNavigate();
@@ -94,10 +98,17 @@ export default function PersistentDrawerLeft() {
     return navigate(url);
   }
 
+  function handleAddSong(song: SongItem) {
+    addSong({...song, semitones})
+  }
+
+  function handleRemoveSong(song: SongItem) {
+    throw new Error('Function not implemented.');
+  }
+
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
-  
       <Drawer
         sx={{
       
@@ -119,7 +130,7 @@ export default function PersistentDrawerLeft() {
         <Divider />
         <List>
           {SongList.map((song) => (
-            <NavListItem goToPage={() => goToPage(`/song/${song.id}`)} text={song.title}  key={song.id} ></NavListItem>
+            <NavListItem addToList={()=> handleAddSong(song)} goToPage={() => goToPage(`/song/${song.id}`)} text={song.title}  key={song.id} ></NavListItem>
           ))}
         </List>
         <Divider />
@@ -173,7 +184,7 @@ export default function PersistentDrawerLeft() {
         <Divider />
         <List>
           {SongList.map((song) => (
-            <NavListItem goToPage={() => goToPage(`/song/${song.id}`)} text={song.title}  key={song.id} ></NavListItem>
+            <NavListItem removeSong={()=> handleRemoveSong(song)} goToPage={() => goToPage(`/song/${song.id}`)} text={song.title}  key={song.id} ></NavListItem>
           ))}
         </List>
         <Divider />

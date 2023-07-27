@@ -4,12 +4,13 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import MusicNoteIcon from "@mui/icons-material/MusicNote";
 
-export const NavListItem: React.FC<any> = ({ text, goToPage }) => {
+export const NavListItem: React.FC<any> = ({ text, goToPage, addToList, removeSong }) => {
   return (
     <>
       <ListItem disablePadding onClick={() => goToPage()}>
+    {addToList && <ListItemIcon onClick={addToList}>{<MusicNoteIcon></MusicNoteIcon>}</ListItemIcon>}
+    {removeSong && <ListItemIcon onClick={removeSong}>--</ListItemIcon>}
         <ListItemButton>
-          <ListItemIcon>{<MusicNoteIcon></MusicNoteIcon>}</ListItemIcon>
           <ListItemText primary={text} />
         </ListItemButton>
       </ListItem>
