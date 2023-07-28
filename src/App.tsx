@@ -26,6 +26,11 @@ import { NavListItem } from './components/NavListItem/NavListItem';
 import { SongItem, SongList } from './constans/songList';
 import { useIndexedDbContext } from './context/IndexedDbContext';
 import { useTransposeContext } from './context/TransposeContext';
+import { initDB } from "react-indexed-db-hook";
+import { useIndexedDB } from "react-indexed-db-hook";
+import { DBConfig } from './lib/DBConfig';
+
+initDB(DBConfig);
 
 
 const drawerWidth = 240;
@@ -72,130 +77,149 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 
 export default function PersistentDrawerLeft() {
   const theme = useTheme();
-  const { songList, handleInitDB, addSong, deleteSong, updateSong, getSongList } = useIndexedDbContext();
+  // const { songList, handleInitDB, addSong, deleteSong, updateSong, getSongList } = useIndexedDbContext();
+  const { getAll, add, deleteRecord } = useIndexedDB('songs');
   const { semitones } = useTransposeContext();
   const [open1, setOpen1] = React.useState(true);
   const [open2, setOpen2] = React.useState(true);
+  const [songList, setSongList] = React.useState<SongItem[]>([]);
   const navigate = useNavigate();
 
-  const handleDrawerOpen = (drawer: NavDraver) => {
-    if(drawer === 'drawer1'){
-      setOpen1(true);
-      return
+  React.useEffect(function () {
+    getSongList();
+    console.log(songList)
+  }, []);
+
+  const getSongList = () => {
+    getAll().then((songs: SongItem[]) => {
+      console.log('all', songs)
+      setSongList(songs);
+    });
+  }
+
+    const handleDrawerOpen = (drawer: NavDraver) => {
+      if (drawer === 'drawer1') {
+        setOpen1(true);
+        return;
+      }
+      setOpen2(true);
+    };
+
+    const handleDrawerClose = (drawer: NavDraver) => {
+      if (drawer === 'drawer1') {
+        setOpen1(false);
+        return;
+      }
+      setOpen2(false);
+    };
+
+    const goToPage = (url: string) => {
+      return navigate(url);
+    };
+
+    function handleAddSong(song: SongItem) {
+      console.log(song);
+      add({ ...song, semitones: `${semitones}` }).then(res => {
+        getSongList();
+        console.log(res)
+      });
+ 
     }
-    setOpen2(true)
-  };
 
-  const handleDrawerClose = (drawer: NavDraver) => {
-    if(drawer === 'drawer1'){
-      setOpen1(false);
-      return
+    function handleRemoveSong(song: SongItem) {
+      deleteRecord(song.id).then((event) => {
+        getSongList();
+      });
     }
-    setOpen2(false)
-  };
 
-  const goToPage = (url: string) => {
-    return navigate(url);
+    return (
+      <Box sx={{ display: 'flex' }}>
+        <CssBaseline />
+        <Drawer
+          sx={{
+            flexShrink: 0,
+            '& .MuiDrawer-paper': {
+              width: drawerWidth,
+              boxSizing: 'border-box',
+            },
+          }}
+          variant="persistent"
+          anchor="left"
+          open={open1}
+        >
+          <DrawerHeader>
+            <IconButton onClick={() => handleDrawerClose('drawer1')}>
+              {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+            </IconButton>
+          </DrawerHeader>
+          <Divider />
+          <List>
+            {SongList.map((song) => (
+              <NavListItem addToList={() => handleAddSong(song)} goToPage={() => goToPage(`/song/${song.id}`)} text={song.title} key={song.id}></NavListItem>
+            ))}
+          </List>
+          <Divider />
+        </Drawer>
+
+        <AppBar position="fixed" open1={open1} open2={open2}>
+          <Toolbar>
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              onClick={() => handleDrawerOpen('drawer1')}
+              edge="start"
+              sx={{ mr: 2, ...(open1 && { display: 'none' }) }}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Typography onClick={() => goToPage('/')} variant="h6" sx={{ flexGrow: 1 }} noWrap component="div">
+              Persistent drawer
+            </Typography>
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              onClick={() => handleDrawerOpen('drawer2')}
+              edge="end"
+              sx={{ ml: 0, ...(open2 && { display: 'none' }) }}
+            >
+              <MenuIcon />
+            </IconButton>
+          </Toolbar>
+        </AppBar>
+
+
+        <Drawer
+          sx={{
+            flexShrink: 0,
+            '& .MuiDrawer-paper': {
+              width: drawerWidth,
+              boxSizing: 'border-box',
+            },
+          }}
+          variant="persistent"
+          anchor="right"
+          open={open2}
+        >
+          <DrawerHeader>
+            <IconButton onClick={() => handleDrawerClose('drawer2')}>
+              {theme.direction === 'rtl' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+            </IconButton>
+          </DrawerHeader>
+          <Divider />
+          <List>
+            {songList?.map((song) => (
+              <NavListItem removeSong={() => handleRemoveSong(song)} goToPage={() => goToPage(`/song/${song.id}`)} text={song.title} key={song.id}></NavListItem>
+            ))}
+          </List>
+          <Divider />
+        </Drawer>
+
+        <Main open1={open1} open2={open2}>
+          <DrawerHeader />
+          <Router></Router>
+        </Main>
+
+      </Box>
+    );
   }
-
-  function handleAddSong(song: SongItem) {
-    addSong({...song, semitones})
-  }
-
-  function handleRemoveSong(song: SongItem) {
-    throw new Error('Function not implemented.');
-  }
-
-  return (
-    <Box sx={{ display: 'flex' }}>
-      <CssBaseline />
-      <Drawer
-        sx={{
-      
-          flexShrink: 0,
-          '& .MuiDrawer-paper': {
-            width:  drawerWidth,
-            boxSizing: 'border-box',
-          },
-        }}
-        variant="persistent"
-        anchor="left"
-        open={open1}
-      >
-        <DrawerHeader>
-          <IconButton onClick={() => handleDrawerClose('drawer1')}>
-            {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-          </IconButton>
-        </DrawerHeader>
-        <Divider />
-        <List>
-          {SongList.map((song) => (
-            <NavListItem addToList={()=> handleAddSong(song)} goToPage={() => goToPage(`/song/${song.id}`)} text={song.title}  key={song.id} ></NavListItem>
-          ))}
-        </List>
-        <Divider />
-      </Drawer>
-
-      <AppBar position="fixed" open1={open1} open2={open2}>
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={() => handleDrawerOpen('drawer1')}
-            edge="start"
-            sx={{ mr: 2, ...(open1 && { display: 'none' }) }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography onClick={() => goToPage('/')} variant="h6" sx={{ flexGrow: 1 }} noWrap component="div">
-            Persistent drawer
-          </Typography>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={() => handleDrawerOpen('drawer2')}
-            edge="end"
-            sx={{ ml: 0, ...(open2 && { display: 'none' }) }}
-          >
-            <MenuIcon />
-          </IconButton>
-        </Toolbar>
-      </AppBar>
-
-
-      <Drawer
-        sx={{
-        
-          flexShrink: 0,
-          '& .MuiDrawer-paper': {
-            width:  drawerWidth,
-            boxSizing: 'border-box',
-          },
-        }}
-        variant="persistent"
-        anchor="right"
-        open={open2}
-      >
-        <DrawerHeader>
-          <IconButton onClick={() => handleDrawerClose('drawer2')}>
-            {theme.direction === 'rtl' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-          </IconButton>
-        </DrawerHeader>
-        <Divider />
-        <List>
-          {SongList.map((song) => (
-            <NavListItem removeSong={()=> handleRemoveSong(song)} goToPage={() => goToPage(`/song/${song.id}`)} text={song.title}  key={song.id} ></NavListItem>
-          ))}
-        </List>
-        <Divider />
-      </Drawer>
-      
-      <Main open1={open1} open2={open2}>
-        <DrawerHeader />
-     <Router></Router>
-      </Main>
-
-    </Box>
-  );
-}
 

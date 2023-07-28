@@ -7,6 +7,7 @@ import "./style.scss";
 import { useEffect, useState } from "react";
 import { SongItem, SongList } from "../../constans/songList";
 import { useIndexedDbContext } from "../../context/IndexedDbContext";
+import { useIndexedDB } from "react-indexed-db-hook";
 
 export const SongPage = () => {
   const { id } = useParams();
@@ -27,7 +28,7 @@ export const SongPage = () => {
   return (
       <div className="song">
       <div className="song__title">
-      <TransposeControl song={song}></TransposeControl>
+      {song && <TransposeControl song={song}></TransposeControl>}
         <p>{title}</p>
         </div>
       <div className="song__items">

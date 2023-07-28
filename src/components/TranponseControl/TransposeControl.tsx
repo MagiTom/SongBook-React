@@ -7,35 +7,46 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import "./styles.scss";
 import { useIndexedDbContext } from "../../context/IndexedDbContext";
 import { SongItem } from "../../constans/songList";
+import { useIndexedDB } from "react-indexed-db-hook";
+import { useEffect, useState } from "react";
 
 export const TransposeControl: React.FC<any> = (song: SongItem | any) => {
-  const { semitones, reset, decrement, increment } = useTransposeContext();
-  const {
-    songList,
-    handleInitDB,
-    addSong,
-    deleteSong,
-    updateSong,
-    getSongList,
-  } = useIndexedDbContext();
+  const { semitones, reset, decrement, increment, setValue } = useTransposeContext();
+  const { update, getByIndex, getAll } = useIndexedDB('songs');
   const isUnison = semitones === 0;
+  const [currentSong, setCurrentSong] = useState<SongItem>();
+
+  useEffect(() => {
+    console.log(song)
+    if(song.song){
+      getAll().then((items) => {
+        const songItem: SongItem = items.find(item => item.id == song.song.id);
+        if(songItem.semitones){
+          setCurrentSong(songItem);
+          setValue(+songItem.semitones);
+        }
+      });
+    }
+  }, [song])
+
+  useEffect(()=>{
+    updateSongList();
+  }, [semitones])
+
   const updateSongList = () => {
-    const findedSong = songList?.find((song) => song.id.toString() === song.id);
-    if (findedSong) {
-      updateSong(song.id, { ...song, semitones });
+    if (currentSong) {
+    
+      update({ ...currentSong, semitones: `${semitones}` });
     }
   };
   const reseting = () => {
     reset();
-    updateSongList();
   };
   const decrementing = () => {
     decrement();
-    updateSongList();
   };
   const incrementing = () => {
     increment();
-    updateSongList();
   };
   return (
     <div className="trans">
@@ -48,7 +59,7 @@ export const TransposeControl: React.FC<any> = (song: SongItem | any) => {
         <RemoveCircleOutlineIcon />
       </IconButton>
       <div>{semitones}</div>
-      <IconButton onClick={incrementing}>
+      <IconButton onClick={() => incrementing()}>
         <AddCircleOutlineIcon />
       </IconButton>
     </div>
