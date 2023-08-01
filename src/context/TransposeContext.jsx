@@ -6,6 +6,7 @@ const TransposeContext = React.createContext({
   increment: () => null,
   decrement: () => null,
   setValue: (value) => null,
+  getValue: () => null,
 })
 
 export function TransposeProvider({ children }) {

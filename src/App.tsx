@@ -119,16 +119,21 @@ export default function PersistentDrawerLeft() {
 
     function handleAddSong(song: SongItem) {
       console.log(song);
-      add({ ...song, semitones: `${semitones}` }).then(res => {
-        getSongList();
-        console.log(res)
+      const songToAdd: SongItem = {
+        ...song, semitones 
+      }
+      add(songToAdd).then(res => {
+        setSongList([{...songToAdd, id: `${res}`}, ...songList]);
       });
  
     }
 
     function handleRemoveSong(song: SongItem) {
       deleteRecord(song.id).then((event) => {
-        getSongList();
+        const updatedSongs = songList.filter((item) => {
+          return song.id !== item.id;
+        });
+        setSongList(updatedSongs);
       });
     }
 

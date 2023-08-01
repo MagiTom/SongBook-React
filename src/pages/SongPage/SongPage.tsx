@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { Chords } from "../../components/Chords/Chords";
 import Lyrics from "../../components/Lyrics/Lyrics";
-import { TransposeProvider } from "../../context/TransposeContext";
+import { TransposeProvider, useTransposeContext } from "../../context/TransposeContext";
 import { TransposeControl } from "../../components/TranponseControl/TransposeControl";
 import "./style.scss";
 import { useEffect, useState } from "react";
@@ -14,10 +14,21 @@ export const SongPage = () => {
   const [song, setSong] = useState<SongItem>();
   const [songArr, setSongArr] = useState<string[] | undefined>([]);
   const [title, setTitle] = useState<string | undefined>('');
+  const { update, getByID } = useIndexedDB('songs');
+  const { semitones, setValue } = useTransposeContext();
 
   useEffect(() => {
     const findedSong = SongList.find(song => song.id.toString() === id);
-    setSong(findedSong);
+    if(findedSong){
+      getByID(findedSong?.id).then((fromDb) => {
+        setSong(fromDb);
+        if(fromDb){
+          setValue(+fromDb?.semitones);
+        }else {
+          setValue(0);
+        }
+      });
+    } 
     const pre = findedSong?.text;
     setTitle(findedSong?.title);
   
@@ -25,10 +36,16 @@ export const SongPage = () => {
     setSongArr(arr);
   }, [id])
 
+  const updateSongList = (ev: number) => {
+    if (song) {
+      update({ ...song, semitones: `${ev}` });
+    }
+  };
+
   return (
       <div className="song">
       <div className="song__title">
-      {song && <TransposeControl song={song}></TransposeControl>}
+      {songArr && <TransposeControl semitones={semitones} onSemitonesChange={updateSongList}></TransposeControl>}
         <p>{title}</p>
         </div>
       <div className="song__items">
