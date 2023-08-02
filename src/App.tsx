@@ -29,6 +29,7 @@ import { useTransposeContext } from './context/TransposeContext';
 import { initDB } from "react-indexed-db-hook";
 import { useIndexedDB } from "react-indexed-db-hook";
 import { DBConfig } from './lib/DBConfig';
+import PrintToPdf from './components/PrintToPdf/PrintToPdf';
 
 initDB(DBConfig);
 
@@ -217,6 +218,7 @@ export default function PersistentDrawerLeft() {
             ))}
           </List>
           <Divider />
+          <PrintToPdf songs={songList}></PrintToPdf>
         </Drawer>
 
         <Main open1={open1} open2={open2}>
