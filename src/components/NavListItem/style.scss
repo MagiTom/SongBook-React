@@ -1,0 +1,11 @@
+.listItem{
+    display: flex;
+}
+.css-cveggr-MuiListItemIcon-root{
+    min-width: auto !important;
+    cursor: pointer;
+
+    &:hover{
+        color: var(--mui-palette-primary-main);
+    }
+}

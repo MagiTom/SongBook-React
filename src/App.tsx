@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { styled, useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -30,8 +29,35 @@ import { initDB } from "react-indexed-db-hook";
 import { useIndexedDB } from "react-indexed-db-hook";
 import { DBConfig } from './lib/DBConfig';
 import PrintToPdf from './components/PrintToPdf/PrintToPdf';
+import { styled, useTheme, createTheme, ThemeProvider } from '@mui/material/styles';
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness5Icon from '@mui/icons-material/Brightness5';
+
 
 initDB(DBConfig);
+// Define separate themes for light and dark modes
+const lightTheme = createTheme({
+  palette: {
+    mode: 'light',
+    primary: {
+      main: '#7D994F',
+      dark: '#4c6337',
+    },
+    secondary: {
+      main: '#666666',
+    },
+    error: {
+      main: '#fbf9f9ff'
+    }
+  },
+});
+
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+    // Define your dark mode color palette here
+  },
+});
 
 
 const drawerWidth = 240;
@@ -84,6 +110,7 @@ export default function PersistentDrawerLeft() {
   const [open1, setOpen1] = React.useState(true);
   const [open2, setOpen2] = React.useState(true);
   const [songList, setSongList] = React.useState<SongItem[]>([]);
+  const [currentMode, setCurrentMode] = React.useState<'light' | 'dark'>('light'); // Track the current mode
   const navigate = useNavigate();
 
   React.useEffect(function () {
@@ -138,7 +165,12 @@ export default function PersistentDrawerLeft() {
       });
     }
 
+    const toggleMode = () => {
+      setCurrentMode(currentMode === 'light' ? 'dark' : 'light');
+    };
+
     return (
+      <ThemeProvider theme={currentMode === 'light' ? lightTheme : darkTheme}>
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
         <Drawer
@@ -181,6 +213,7 @@ export default function PersistentDrawerLeft() {
             <Typography onClick={() => goToPage('/')} variant="h6" sx={{ flexGrow: 1 }} noWrap component="div">
               Persistent drawer
             </Typography>
+            <IconButton onClick={toggleMode}>{currentMode === 'light' ? <Brightness5Icon/> : <Brightness4Icon />}</IconButton>
             <IconButton
               color="inherit"
               aria-label="open drawer"
@@ -227,6 +260,7 @@ export default function PersistentDrawerLeft() {
         </Main>
 
       </Box>
+      </ThemeProvider>
     );
   }
 
