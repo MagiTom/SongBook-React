@@ -22,8 +22,8 @@ export const SongView: React.FC<{song:SongItem | undefined, isPrintMode?: boolea
         console.log(ev)
     }
     return (
-        <div className="song">
-        <div className="song__title page-break">
+        <div className="song page-break">
+        <div className="song__title">
           <p>{title}</p>
         { !song.isPrintMode && <TransposeControl semitones={semitones} onSemitonesChange={changeSemiTones}></TransposeControl> }
           </div>
