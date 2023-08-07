@@ -11,15 +11,7 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-
-import MusicNoteIcon from '@mui/icons-material/MusicNote';
-import { Route, RouterProvider, Routes, createBrowserRouter, redirect, useNavigate, useNavigation } from 'react-router-dom';
-import HomePage from './pages/HomePage';
-import SongPage from './pages/SongPage/SongPage';
+import { useNavigate } from 'react-router-dom';
 import Router from './components/router';
 import { NavListItem } from './components/NavListItem/NavListItem';
 import { SongItem, SongList } from './constans/songList';
@@ -32,6 +24,8 @@ import PrintToPdf from './components/PrintToPdf/PrintToPdf';
 import { styled, useTheme, createTheme, ThemeProvider } from '@mui/material/styles';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness5Icon from '@mui/icons-material/Brightness5';
+import MusicNoteIcon from '@mui/icons-material/MusicNote';
+import './App.css'
 
 
 initDB(DBConfig);
@@ -186,6 +180,7 @@ export default function PersistentDrawerLeft() {
           open={open1}
         >
           <DrawerHeader>
+          <Typography className='drawerTitle' color={'primary'}>Spis piosenek</Typography>
             <IconButton onClick={() => handleDrawerClose('drawer1')}>
               {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
             </IconButton>
@@ -210,9 +205,11 @@ export default function PersistentDrawerLeft() {
             >
               <MenuIcon />
             </IconButton>
-            <Typography onClick={() => goToPage('/')} variant="h6" sx={{ flexGrow: 1 }} noWrap component="div">
-              Persistent drawer
+            <Typography className='drawerTitle' onClick={() => goToPage('/')} variant="h6" sx={{ flexGrow: 1 }} noWrap component="div">
+              Śpiewnik Uwielbieniowy
+              <MusicNoteIcon></MusicNoteIcon>
             </Typography>
+           
             <IconButton onClick={toggleMode}>{currentMode === 'light' ? <Brightness5Icon/> : <Brightness4Icon />}</IconButton>
             <IconButton
               color="inherit"
@@ -240,6 +237,7 @@ export default function PersistentDrawerLeft() {
           open={open2}
         >
           <DrawerHeader>
+            <Typography color={'primary'} className='drawerTitle'>Wybrane utwory</Typography>
             <IconButton onClick={() => handleDrawerClose('drawer2')}>
               {theme.direction === 'rtl' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
             </IconButton>

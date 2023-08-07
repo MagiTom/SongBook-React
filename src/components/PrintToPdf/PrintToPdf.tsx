@@ -2,6 +2,8 @@ import React, { useRef } from "react";
 import { SongItem } from "../../constans/songList";
 import ReactToPrint from 'react-to-print';
 import { SongView } from "../SongView/SongView";
+import { Button } from "@mui/material";
+import "./style.scss";
 
 const PrintToPdf: React.FC<{ songs: SongItem[] }> = ({ songs }) => {
     const componentRef = useRef(null);
@@ -11,9 +13,9 @@ const PrintToPdf: React.FC<{ songs: SongItem[] }> = ({ songs }) => {
     ));
 
     return (
-        <div>
+        <div className="printBtn">
             <ReactToPrint
-                trigger={() => <button>Print this out!</button>}
+                trigger={() => <Button disabled={!songs?.length} variant="contained">Wydrukuj</Button>}
                 content={() => componentRef.current}
             />
             <div style={{overflow: 'hidden', height: '0'}}>

@@ -25,16 +25,16 @@ export const TransposeControl: React.FC<any> = ({ semitones, onSemitonesChange }
   };
   return (
     <div className="trans">
-      <span className="trans__title">Transpose</span>
+      <span className="trans__title">Transponuj</span>
 
-      <IconButton onClick={reseting} disabled={isUnison}>
+      <IconButton color="primary" onClick={reseting} disabled={isUnison}>
         <RestartAltIcon />
       </IconButton>
-      <IconButton onClick={decrementing}>
+      <IconButton color="primary" onClick={decrementing}>
         <RemoveCircleOutlineIcon />
       </IconButton>
-      <div>{semitones}</div>
-      <IconButton onClick={() => incrementing()}>
+      <div className="trans__semitones">{semitones}</div>
+      <IconButton color="primary" onClick={() => incrementing()}>
         <AddCircleOutlineIcon />
       </IconButton>
     </div>

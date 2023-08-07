@@ -1,3 +1,5 @@
+@import '/src/styles/variables.scss';
+
 .trans{
     display: flex;
     justify-content: center;
@@ -5,4 +7,17 @@
     position: absolute;
     left: 0;
     top: 0;
+    padding: 0 1em;
+    border: 1px solid $border-color;
+    border-radius: 5px;
+
+    &__title{
+        text-transform: uppercase;
+        color: var(--mui-palette-primary-main);
+    }
+
+    &__semitones{
+        color: var(--mui-palette-primary-main);
+    }
+
 }
