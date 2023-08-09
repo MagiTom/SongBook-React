@@ -13,11 +13,11 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <BrowserRouter>
-    <SonglistProvider>
     <TransposeProvider>
+    <SonglistProvider>
        <App />
-       </TransposeProvider>
        </SonglistProvider>
+       </TransposeProvider>
     </BrowserRouter>
   </React.StrictMode>
 );

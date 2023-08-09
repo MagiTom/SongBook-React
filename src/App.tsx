@@ -26,6 +26,7 @@ import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness5Icon from '@mui/icons-material/Brightness5';
 import MusicNoteIcon from '@mui/icons-material/MusicNote';
 import './App.css'
+import { useSongListContext } from './context/SongListContext';
 
 
 initDB(DBConfig);
@@ -98,26 +99,11 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 
 export default function PersistentDrawerLeft() {
   const theme = useTheme();
-  // const { songList, handleInitDB, addSong, deleteSong, updateSong, getSongList } = useIndexedDbContext();
-  const { getAll, add, deleteRecord } = useIndexedDB('songs');
-  const { semitones } = useTransposeContext();
+  const { addSong, removeSong, songItemList } = useSongListContext();
   const [open1, setOpen1] = React.useState(true);
   const [open2, setOpen2] = React.useState(true);
-  const [songList, setSongList] = React.useState<SongItem[]>([]);
   const [currentMode, setCurrentMode] = React.useState<'light' | 'dark'>('light'); // Track the current mode
   const navigate = useNavigate();
-
-  React.useEffect(function () {
-    getSongList();
-    console.log(songList)
-  }, []);
-
-  const getSongList = () => {
-    getAll().then((songs: SongItem[]) => {
-      console.log('all', songs)
-      setSongList(songs);
-    });
-  }
 
     const handleDrawerOpen = (drawer: NavDraver) => {
       if (drawer === 'drawer1') {
@@ -140,23 +126,11 @@ export default function PersistentDrawerLeft() {
     };
 
     function handleAddSong(song: SongItem) {
-      console.log(song);
-      const songToAdd: SongItem = {
-        ...song, semitones 
-      }
-      add(songToAdd).then(res => {
-        setSongList([{...songToAdd, id: `${res}`}, ...songList]);
-      });
- 
+      addSong(song);
     }
 
     function handleRemoveSong(song: SongItem) {
-      deleteRecord(song.id).then((event) => {
-        const updatedSongs = songList.filter((item) => {
-          return song.id !== item.id;
-        });
-        setSongList(updatedSongs);
-      });
+      removeSong(song)
     }
 
     const toggleMode = () => {
@@ -244,12 +218,12 @@ export default function PersistentDrawerLeft() {
           </DrawerHeader>
           <Divider />
           <List>
-            {songList?.map((song) => (
+            {songItemList?.map(((song: SongItem) => (
               <NavListItem removeSong={() => handleRemoveSong(song)} goToPage={() => goToPage(`/song/${song.id}`)} text={song.title} key={song.id}></NavListItem>
-            ))}
+            )))}
           </List>
           <Divider />
-          <PrintToPdf songs={songList}></PrintToPdf>
+          <PrintToPdf songs={songItemList}></PrintToPdf>
         </Drawer>
 
         <Main open1={open1} open2={open2}>
