@@ -1,6 +1,12 @@
+
 .categories{
     display: flex;
     gap: 1em;
     flex-wrap: wrap;
     justify-content: center;
+}
+
+.songs{
+    margin: 2em auto;
+    width: fit-content;
 }

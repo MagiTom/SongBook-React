@@ -9,11 +9,28 @@ import "./style.scss";
 import { Tooltip } from "@mui/material";
 
 export const NavListItem: React.FC<any> = ({ text, goToPage, addToList, removeSong }) => {
+
+  const handleAddToList = (event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (addToList) {
+      addToList();
+    }
+  };
+
+  const handleRemoveSong = (event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (removeSong) {
+      removeSong();
+    }
+  };
+
   return (
     <>
       <ListItem onClick={() => goToPage()}>
-    {addToList && <Tooltip title="Dodaj" arrow><ListItemIcon onClick={addToList}>{<AddCircleIcon />}</ListItemIcon></Tooltip>}
-    {removeSong && <Tooltip title="Usuń" arrow><ListItemIcon onClick={removeSong}>{<RemoveCircleIcon />}</ListItemIcon></Tooltip>}
+    {addToList && <Tooltip title="Dodaj" arrow><ListItemIcon onClick={handleAddToList}>{<AddCircleIcon />}</ListItemIcon></Tooltip>}
+    {removeSong && <Tooltip title="Usuń" arrow><ListItemIcon onClick={handleRemoveSong}>{<RemoveCircleIcon />}</ListItemIcon></Tooltip>}
         <ListItemButton>
           <ListItemText primary={text} />
         </ListItemButton>

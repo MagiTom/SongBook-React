@@ -10,14 +10,33 @@ export const HomePage = () => {
   const categoriesList = categories;
   const songList: SongItem[] = SongList;
   const [choosenList, setChoosenList] = useState<SongItem[]>([]);
+  const [songListItems, setSongListItems] = useState<SongItem[]>([]);
   const { addSong, songItemList } = useSongListContext();
   
-  useEffect(function () {
-   setChoosenList(songList);
-  }, []);
+  useEffect(() => {
+    const updatedChoosenList = songList.map((song) => {
+      const isAdded = songItemList.some((item: SongItem) => item.id === song.id);
+      return {
+        ...song,
+        added: isAdded,
+      };
+    });
+    setSongListItems(updatedChoosenList);
+    setChoosenList(updatedChoosenList);
+  }, [songItemList, songList]);
 
-  const addSongItem = () =>{
+  const addSongItem = (song: SongItem) =>{
+    addSong(song);
+      setChoosenList((prevList) =>
+    prevList.map((prevSong) =>
+      prevSong.id === song.id ? { ...prevSong, added: true } : prevSong
+    )
+  );
+  }
 
+  const filterByCategory = (category: string) =>{
+      const updatedChoosenList = songListItems.filter(song => song.category === category);
+      setChoosenList(updatedChoosenList);
   }
 
   return (
@@ -27,12 +46,12 @@ export const HomePage = () => {
           <CategoryButton
             key={category.id} 
             category={category}
-            getCategory={() => console.log("jajajja")} 
+            getCategory={() => filterByCategory(category.key)} 
           />
         ))}
       </div>
       <div className="songs">
-          {choosenList?.map(song => <SongTitle key={song.id} addSongToList={addSongItem} song={song} added={false} />)}
+          {choosenList?.map(song => <SongTitle key={song.id} addSongToList={addSongItem} song={song} added={song.added || false} />)}
       </div>
     </div>
   );

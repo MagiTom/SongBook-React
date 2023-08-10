@@ -2,11 +2,14 @@ export type SongItem = {
     id: string,
     title: string,
     text: string,
-    semitones?: number
+    category: string,
+    semitones?: number,
+    added?: boolean,
 }
 
 export const SongList: SongItem[] = [{
     id: '1',
+    category: 'thanksgiving',
     title: `jdjdjdjdj`,
     text:   
     `    G C Em        D  
@@ -63,6 +66,7 @@ export const SongList: SongItem[] = [{
 },
 {
     id: '2',
+    category: 'worship',
     title: `jdjdjdj2222dj`,
     text:   
     `    G C Em        D  
@@ -87,6 +91,7 @@ export const SongList: SongItem[] = [{
 },
 {
     id: '3',
+    category: 'request',
     title: `jdjdjdj2222djaa`,
     text:   
     `    G C Em        D  
