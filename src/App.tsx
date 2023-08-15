@@ -99,7 +99,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 
 export default function PersistentDrawerLeft() {
   const theme = useTheme();
-  const { addSong, removeSong, songItemList } = useSongListContext();
+  const { addSong, removeSong, songItemList, allSongList } = useSongListContext();
   const [open1, setOpen1] = React.useState(true);
   const [open2, setOpen2] = React.useState(true);
   const [currentMode, setCurrentMode] = React.useState<'light' | 'dark'>('light'); // Track the current mode
@@ -161,8 +161,8 @@ export default function PersistentDrawerLeft() {
           </DrawerHeader>
           <Divider />
           <List>
-            {SongList.map((song) => (
-              <NavListItem addToList={() => handleAddSong(song)} goToPage={() => goToPage(`/song/${song.id}`)} text={song.title} key={song.id}></NavListItem>
+            {allSongList.map((song: SongItem) => (
+              <NavListItem addToList={() => handleAddSong(song)} goToPage={() => goToPage(`/song/${song.id}`)} song={song} key={song.id}></NavListItem>
             ))}
           </List>
           <Divider />
@@ -219,7 +219,7 @@ export default function PersistentDrawerLeft() {
           <Divider />
           <List>
             {songItemList?.map(((song: SongItem) => (
-              <NavListItem removeSong={() => handleRemoveSong(song)} goToPage={() => goToPage(`/song/${song.id}`)} text={song.title} key={song.id}></NavListItem>
+              <NavListItem removeSong={() => handleRemoveSong(song)} goToPage={() => goToPage(`/song/${song.id}`)} song={song} key={song.id}></NavListItem>
             )))}
           </List>
           <Divider />

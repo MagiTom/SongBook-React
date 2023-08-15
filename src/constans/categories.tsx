@@ -19,5 +19,10 @@ export const categories: Category[] = [
     id: 3,
     key: 'request',
     name: 'prośba'
+},
+{
+    id: 4,
+    key: '',
+    name: 'wszystkie'
 }
 ]

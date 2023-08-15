@@ -7,8 +7,16 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import "./style.scss";
 import { Tooltip } from "@mui/material";
+import { SongItem } from "../../constans/songList";
 
-export const NavListItem: React.FC<any> = ({ text, goToPage, addToList, removeSong }) => {
+interface NavListItemProps{
+  song: SongItem,
+  goToPage: () => void, 
+  addToList?: () => void,  
+  removeSong?: () => void, 
+}
+
+export const NavListItem: React.FC<NavListItemProps> = ({ song, goToPage, addToList, removeSong }) => {
 
   const handleAddToList = (event: React.MouseEvent) => {
     event.preventDefault();
@@ -29,10 +37,10 @@ export const NavListItem: React.FC<any> = ({ text, goToPage, addToList, removeSo
   return (
     <>
       <ListItem onClick={() => goToPage()}>
-    {addToList && <Tooltip title="Dodaj" arrow><ListItemIcon onClick={handleAddToList}>{<AddCircleIcon />}</ListItemIcon></Tooltip>}
+    {addToList && <Tooltip title="Dodaj" arrow><ListItemIcon className={song?.added ? 'hidden' : ''} onClick={handleAddToList}>{<AddCircleIcon />}</ListItemIcon></Tooltip>}
     {removeSong && <Tooltip title="Usuń" arrow><ListItemIcon onClick={handleRemoveSong}>{<RemoveCircleIcon />}</ListItemIcon></Tooltip>}
         <ListItemButton>
-          <ListItemText primary={text} />
+          <ListItemText primary={song.title} />
         </ListItemButton>
       </ListItem>
     </>

@@ -40,7 +40,7 @@ export const SongPage = () => {
       <div className="song__title">
       {/* {song && <TransposeControl semitones={semitones} onSemitonesChange={updateSongList}></TransposeControl>} */}
         </div>
-      <SongView song={song}></SongView>
+      {song && <SongView song={song}></SongView>}
       </div>
   );
 };

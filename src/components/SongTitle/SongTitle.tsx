@@ -8,14 +8,26 @@ import "./style.scss";
 
 export interface SongItemProp {
 song: SongItem;
-added: boolean;
 addSongToList: (songItem: SongItem) => void;
+goToPage: () => void;
 }
 
 const SongTitle: React.FC<SongItemProp> = (props) => {
-  return (<div className="songTitle">{!props.added && <IconButton onClick={() => props.addSongToList(props.song)} color="secondary" aria-label="add an alarm">
+  const goPage = (ev: React.MouseEvent) => {
+    ev.preventDefault();
+    ev.stopPropagation();
+    props.goToPage();
+  };
+  const addToList = (ev: React.MouseEvent) => {
+    ev.preventDefault();
+    ev.stopPropagation();
+    props.addSongToList(props.song)
+  };
+
+
+  return (<div onClick={goPage} className="songTitle"><IconButton className={props.song.added ? 'hidden' : ''} onClick={addToList} color="secondary" aria-label="add an alarm">
   <AddIcon />
-</IconButton>}<p>{props.song.title}</p></div>);
+</IconButton><p>{props.song.title}</p></div>);
 };
 
 export default SongTitle;
