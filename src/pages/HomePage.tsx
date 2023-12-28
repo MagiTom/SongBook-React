@@ -15,15 +15,23 @@ export const HomePage = () => {
   const collectionRef = collection(db, 'songs');
 
   const getData = async () => {
-    const docRef = doc(db, "songs", 'ZEL8bu0JyDntRZGJG4qk');
+    const id = 'ZEL8bu0JyDntRZGJG4qk'
+    const title = 'test2'
+    const docRef = doc(db, "songs", id);
 const docSnap = getDoc(docRef);
+const questionRef = collection(db, `songs/${docRef.id}/${title}`);
+console.log("questionRef", questionRef);
+getDocs(questionRef).then(async (todo) => {
+  let data = todo.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+  console.log('text=>', data[0]);
 
 if ((await docSnap).exists()) {
   console.log("Document data:", (await docSnap).data());
 } else {
   console.log("No such document!");
 }
-  }
+  })
+}
 
   const fetchData = async () => {
     const catRef = collection(db, "songs");
@@ -35,7 +43,7 @@ if ((await docSnap).exists()) {
       getDocs(questionRef).then((todo) => {
         console.log('ooo1=>', todo);
         let data = todo.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
-        console.log('ooo2=>', data[0]);
+        console.log('text=>', data[0]);
         }).catch((err) => {
           console.log(err);
         })
@@ -49,14 +57,14 @@ if ((await docSnap).exists()) {
       await getDocs(collectionRef).then((todo) => {
         console.log(todo.docs);
         let data = todo.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
-        console.log(data);
+        console.log('datq', data);
         }).catch((err) => {
           console.log(err);
         })
       }
     getTodo()
     getData()
-    fetchData()
+    // fetchData()
     }, [])
 
   const navigate = useNavigate();
@@ -82,11 +90,16 @@ if ((await docSnap).exists()) {
    }
 
   const sending = () =>{
-    const title = 'test5'
+    const title = 'test8'
     addDoc(collectionRef, { title, text: 'lalal777alalla lalla', category: 'worship' }).then((res: any) => {
       console.log('respon', res.id);
       const questionRef = collection(db, `songs/${res.id}/${title}`);
-      addDoc(questionRef, {text: 'udało sie'})
+      addDoc(questionRef, {text:  `G C Em        D  
+        Mabuhay kayong mga di pangkaraniwan 
+        G C Em D 
+        Pag-ibig ninyo ay walang hangganan 
+        G C Em D 
+        Mabuhay kayong lubos ang katapatan `})
     })
     // Create a new document in sub-collection `general`
 

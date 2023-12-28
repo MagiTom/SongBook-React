@@ -1,13 +1,15 @@
 import { createContext, useState, useEffect, useContext } from 'react';
 import { useIndexedDB } from "react-indexed-db-hook";
-import { SongItem, SongList } from '../constans/songList';
+import { SongItem, SongList, SongListItem } from '../constans/songList';
 import { useTransposeContext } from './TransposeContext';
+import { useSongsDbContext } from './firebaseContext';
 
 const SongListContext: React.Context<any> = createContext([]);
 
 export const SonglistProvider: React.FC<any> = ({ children }) =>{
     const { getAll, add, deleteRecord } = useIndexedDB('songs');
     const { semitones } = useTransposeContext();
+    const { songListDb, getSongListDb } = useSongsDbContext();
     const [songItemList, setSongList] = useState<SongItem[]>([]);
     const [allSongList, setAllSongList] = useState<SongItem[]>([]);
     const songList = SongList;
@@ -51,17 +53,20 @@ export const SonglistProvider: React.FC<any> = ({ children }) =>{
       }, []);
     
       const getSongList = () => {
-        getAll().then((songs: SongItem[]) => {
-          console.log('all', songs)
-          const updatedChoosenList = songList.map((song) => {
-            const isAdded = songs.some((item: SongItem) => item.id === song.id);
-            return {
-              ...song,
-              added: isAdded,
-            };
+        getSongListDb().then((res: SongListItem[]) => {
+          getAll().then((songs: SongItem[]) => {
+            console.log('all', songs)
+            console.log('songListDb', songListDb)
+            const updatedChoosenList = res.map((song) => {
+              const isAdded = songs.some((item: SongItem) => item.id === song.id);
+              return {
+                ...song,
+                added: isAdded,
+              };
+            });
+            setAllSongList(updatedChoosenList);
+            setSongList(songs);
           });
-          setAllSongList(updatedChoosenList);
-          setSongList(songs);
         });
       }
 

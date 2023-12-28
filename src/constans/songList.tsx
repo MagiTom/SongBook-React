@@ -1,13 +1,25 @@
-export type SongItem = {
+export interface SongToAdd {
+    title: string,
+    category: string,
+    text: string,
+}
+
+export interface SongListItem {
     id: string,
     title: string,
-    text: string,
     category: string,
+}
+
+export interface SongItem extends SongListItem {
     semitones?: number,
     added?: boolean,
 }
 
-export const SongList: SongItem[] = [{
+export interface SongPageItem extends SongItem {
+    text: string,
+}
+
+export const SongList: SongPageItem[] = [{
     id: '1',
     category: 'thanksgiving',
     title: `jdjdjdjdj`,

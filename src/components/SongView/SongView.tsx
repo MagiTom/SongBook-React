@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { SongItem } from "../../constans/songList";
+import { SongItem, SongPageItem } from "../../constans/songList";
 import { Chords } from "../Chords/Chords";
 import Lyrics from "../Lyrics/Lyrics";
 import { useTransposeContext } from "../../context/TransposeContext";
@@ -7,9 +7,9 @@ import { TransposeControl } from "../TranponseControl/TransposeControl";
 import SongTitle from "../SongTitle/SongTitle";
 
 
-export const SongView: React.FC<{song:SongItem, isPrintMode?: boolean}> = (props, isPrintMode = false) => {
+export const SongView: React.FC<{song: SongPageItem, isPrintMode?: boolean}> = (props, isPrintMode = false) => {
     const [songArr, setSongArr] = useState<string[] | undefined>([]);
-    const [songItem, setSongItem] = useState<SongItem>();
+    const [songItem, setSongItem] = useState<SongPageItem>();
     const { semitones } = useTransposeContext();
 
     useEffect(() => {
@@ -17,6 +17,7 @@ export const SongView: React.FC<{song:SongItem, isPrintMode?: boolean}> = (props
         setSongItem(songItemEl);
         const pre = songItemEl?.text;
         let arr: string[] | undefined = pre?.split("\n");
+        console.log('text', arr)
         setSongArr(arr);
       }, [props])
     const changeSemiTones = (ev: number)=>{

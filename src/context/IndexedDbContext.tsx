@@ -1,13 +1,13 @@
 import React, { useContext, useState } from "react";
 import { Stores, addData, deleteData, getStoreData, initDB, updateData } from '../lib/db';
-import { SongItem } from "../constans/songList";
+import { SongItem, SongPageItem } from "../constans/songList";
 import { useIndexedDB } from "react-indexed-db-hook";
 
 
 export interface IndexedDbModel {
   songList: SongItem[] | undefined,
   handleInitDB: () => Promise<void>,
-  addSong: (song: SongItem) => Promise<void>,
+  addSong: (song: SongPageItem) => Promise<void>,
   deleteSong: (id: string) => Promise<void>,
   updateSong: (id: string, updatedSong: SongItem) => Promise<void>,
   getSongList: () => Promise<void>,
@@ -31,7 +31,7 @@ export const IndexedDbProvider: React.FC<any> = ({ children }) => {
     // setIsDBReady(!!status); // If needed, you can uncomment this line.
   };
 
-  const addSong = async (song: SongItem) => {
+  const addSong = async (song: SongPageItem) => {
     const songToAdd = {
       id: Date.now().toString(),
       title: song.title,

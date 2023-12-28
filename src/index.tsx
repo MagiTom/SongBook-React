@@ -5,6 +5,7 @@ import App from './App';
 import { BrowserRouter } from 'react-router-dom';
 import { SonglistProvider } from './context/SongListContext';
 import { TransposeProvider } from './context/TransposeContext';
+import { SongsDbProvider } from './context/firebaseContext';
 
 
 const root = ReactDOM.createRoot(
@@ -13,11 +14,13 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <BrowserRouter>
+    <SongsDbProvider>
     <TransposeProvider>
     <SonglistProvider>
        <App />
        </SonglistProvider>
        </TransposeProvider>
+       </SongsDbProvider>
     </BrowserRouter>
   </React.StrictMode>
 );

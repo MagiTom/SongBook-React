@@ -27,6 +27,7 @@ import Brightness5Icon from '@mui/icons-material/Brightness5';
 import MusicNoteIcon from '@mui/icons-material/MusicNote';
 import './App.css'
 import { useSongListContext } from './context/SongListContext';
+import AddSongDialog from './components/AddSongDialog/AddSongDialog';
 
 
 initDB(DBConfig);
@@ -166,6 +167,7 @@ export default function PersistentDrawerLeft() {
             ))}
           </List>
           <Divider />
+          <AddSongDialog></AddSongDialog>
         </Drawer>
 
         <AppBar position="fixed" open1={open1} open2={open2}>

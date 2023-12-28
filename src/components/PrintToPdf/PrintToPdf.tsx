@@ -1,11 +1,11 @@
 import React, { useRef } from "react";
-import { SongItem } from "../../constans/songList";
+import { SongItem, SongPageItem } from "../../constans/songList";
 import ReactToPrint from 'react-to-print';
 import { SongView } from "../SongView/SongView";
 import { Button } from "@mui/material";
 import "./style.scss";
 
-const PrintToPdf: React.FC<{ songs: SongItem[] }> = ({ songs }) => {
+const PrintToPdf: React.FC<{ songs: SongPageItem[] }> = ({ songs }) => {
     const componentRef = useRef(null);
 
     const contentToPrint = songs.map(song => (
