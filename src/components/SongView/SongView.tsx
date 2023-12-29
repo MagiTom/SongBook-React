@@ -5,7 +5,7 @@ import Lyrics from "../Lyrics/Lyrics";
 import { useTransposeContext } from "../../context/TransposeContext";
 import { TransposeControl } from "../TranponseControl/TransposeControl";
 import SongTitle from "../SongTitle/SongTitle";
-
+import "./style.scss";
 
 export const SongView: React.FC<{song: SongPageItem, isPrintMode?: boolean}> = (props, isPrintMode = false) => {
     const [songArr, setSongArr] = useState<string[] | undefined>([]);
@@ -26,8 +26,9 @@ export const SongView: React.FC<{song: SongPageItem, isPrintMode?: boolean}> = (
     return (
         <div className="song page-break">
         <div className="song__title">
-         <p>{songItem && <SongTitle goToPage={()=> {}} key={songItem?.id} addSongToList={()=>{}} song={songItem} />}</p>
         { !props.isPrintMode && <TransposeControl semitones={semitones} onSemitonesChange={changeSemiTones}></TransposeControl> }
+         {songItem && <SongTitle goToPage={()=> {}} key={songItem?.id} addSongToList={()=>{}} song={songItem} />}
+
           </div>
         <div className="song__items">
           {songArr && songArr.map((songEl, index) => (

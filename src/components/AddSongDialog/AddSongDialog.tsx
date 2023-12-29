@@ -1,5 +1,7 @@
 import React, { RefObject, useEffect, useRef } from "react";
 import Button from "@mui/material/Button";
+import DeleteIcon from "@mui/icons-material/Delete";
+import "./style.scss";
 import { Category } from "../../constans/categories";
 import {
   Dialog,
@@ -13,10 +15,12 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
+  IconButton,
 } from "@mui/material";
 import { useSongsDbContext } from "../../context/firebaseContext";
 import { SongPageItem, SongToAdd } from "../../constans/songList";
 import { useSongListContext } from "../../context/SongListContext";
+import AlertDialog from "../AlertDialog/AlertDialog";
 
 export type SongProps = {
   song?: SongPageItem;
@@ -76,19 +80,30 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
   };
 
   const handleChangeCategory = (event: SelectChangeEvent) => {
-      console.log('eeeeeeee', event)
-      setCategory(event.target.value);
+    console.log("eeeeeeee", event);
+    event.stopPropagation();
+    event.preventDefault();
+    setCategory(event.target.value);
   };
   const addCategory = async () => {
     const categororyItem: Category = {
-      name: newCategory
-    }
+      name: newCategory,
+    };
     await addCategoryDb(categororyItem);
     setCategory(categororyItem.name);
+    setNewCategory("");
   };
-  const removeCategory = async (id: string) => {
-    await removeCategory(id);
-    setCategory('');
+  const deleteCategory = async (categoryItem: Category) => {
+    // event.preventDefault();
+    // event.stopPropagation();
+    await deleteCategoryDb(categoryItem?.id || '');
+    console.log(category)
+    if (categoryItem.name === category) {
+      setCategory("")
+    } else {
+      setCategory(category);
+    }
+
   };
 
   return (
@@ -120,23 +135,41 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
                 id="demo-simple-select"
                 value={category}
                 label="Category"
-                onChange={handleChangeCategory}
+                onChange={(event) => handleChangeCategory(event)}
               >
-              {categoriesDb.map(category => <MenuItem value={category.name}>{category.name}</MenuItem>)}  
+                {categoriesDb.map((category) => (
+                  <MenuItem value={category.name} key={category.id}>
+                    <div className="category__item">
+                      <p>{category.name}</p>
+
+                      <AlertDialog
+                        confirmAction={() => deleteCategory(category)}
+                        button={
+                          <IconButton aria-label="delete">
+                            <DeleteIcon />
+                          </IconButton>
+                        }
+                      ></AlertDialog>
+                    </div>
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
             <div className="category__add">
               <TextField
                 fullWidth
+                variant="filled"
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                   setNewCategory(event.target.value);
                 }}
-                variant="standard"
+                value={newCategory}
                 label="category"
                 margin="dense"
                 id="category"
               />
-              <Button onClick={addCategory}>Dodaj Kategorie</Button>
+              <Button variant="contained" color="success" onClick={addCategory}>
+                Dodaj Kategorie
+              </Button>
             </div>
           </div>
           <TextField

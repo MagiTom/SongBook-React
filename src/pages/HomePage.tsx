@@ -15,58 +15,10 @@ export const HomePage = () => {
   const categoriesList = categories;
   const collectionRef = collection(db, 'songs');
   const { getCategoriesDb } = useSongsDbContext();
-
-  const getData = async () => {
-    const id = 'ZEL8bu0JyDntRZGJG4qk'
-    const title = 'test2'
-    const docRef = doc(db, "songs", id);
-const docSnap = getDoc(docRef);
-const questionRef = collection(db, `songs/${docRef.id}/${title}`);
-console.log("questionRef", questionRef);
-getDocs(questionRef).then(async (todo) => {
-  let data = todo.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
-  console.log('text=>', data[0]);
-
-if ((await docSnap).exists()) {
-  console.log("Document data:", (await docSnap).data());
-} else {
-  console.log("No such document!");
-}
-  })
-}
-
-  const fetchData = async () => {
-    const catRef = collection(db, "songs");
-    const querySnapshot = await getDocs(catRef);
-    querySnapshot.forEach((doc) => {
-      console.log(doc.id, " => ", doc.data());
-      const questionRef = collection(db, `songs/${doc.id}/${doc.data().title}`);
-      console.log("questionRef", questionRef);
-      getDocs(questionRef).then((todo) => {
-        console.log('ooo1=>', todo);
-        let data = todo.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
-        console.log('text=>', data[0]);
-        }).catch((err) => {
-          console.log(err);
-        })
-    });
-  };
-  
+  const { categoriesDb, deleteCategoryDb, addCategoryDb } = useSongsDbContext();
 
   useEffect(() => {
-    getCategoriesDb()
-    const getTodo = async () => {
-      await getDocs(collectionRef).then((todo) => {
-        console.log(todo.docs);
-        let data = todo.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
-        console.log('datq', data);
-        }).catch((err) => {
-          console.log(err);
-        })
-      }
-    getTodo()
-    getData()
-    // fetchData()
+    getCategoriesDb();
     }, [])
 
   const navigate = useNavigate();
@@ -74,57 +26,19 @@ if ((await docSnap).exists()) {
     return navigate(`/${category}`);
   }
 
-  const deleteTodo = async (id: string) => {
-    try {
-      const ide = 'SM7OEa4risyHhdQElkea'
-      const title = 'test5';
-      const textId = '93mH0SXbsuTae8d8ncQm'
-       window.confirm("Are you sure you want to delete this Todo?")
-       const documentRef = doc(db, "songs", ide);
-       const questionRef = collection(db, `songs/${ide}/${title}`);
-       const documentRef2 = doc(questionRef, textId);
-       await deleteDoc(documentRef2)
-       await deleteDoc(documentRef)
-       window.location.reload();
-       } catch (err) {
-       console.log(err);
-     }
-   }
-
-  const sending = () =>{
-    const title = 'test8'
-    addDoc(collectionRef, { title, text: 'lalal777alalla lalla', category: 'worship' }).then((res: any) => {
-      console.log('respon', res.id);
-      const questionRef = collection(db, `songs/${res.id}/${title}`);
-      addDoc(questionRef, {text:  `G C Em        D  
-        Mabuhay kayong mga di pangkaraniwan 
-        G C Em D 
-        Pag-ibig ninyo ay walang hangganan 
-        G C Em D 
-        Mabuhay kayong lubos ang katapatan `})
-    })
-    // Create a new document in sub-collection `general`
-
-  }
   return (
     <div className="home">
       <div className="categories">
-        {categoriesList.map((category) => (
+        {categoriesDb.map((category) => (
           <CategoryButton
             key={category.id} 
             category={category}
-            getCategory={() => goToCategory(category.key)} 
+            getCategory={() => goToCategory(category.name)} 
           />
         ))}
       </div>
       <div className="songs">
       <Outlet />
-      </div>
-      <div>
-        <p>TEST</p>
-        <textarea></textarea>
-        <button onClick={sending}>send</button>
-        <button onClick={() => deleteTodo('')}>delete</button>
       </div>
     </div>
   );

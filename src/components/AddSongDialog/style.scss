@@ -1,0 +1,16 @@
+.category{
+    display: flex;
+    gap: 2em;
+    &__item{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        p{
+            margin: 0;
+        }
+    }
+    .css-1z10yd4-MuiFormControl-root-MuiTextField-root{
+        margin-top: 0;
+    }
+}
