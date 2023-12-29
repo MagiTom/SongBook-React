@@ -29,23 +29,40 @@ export const SonglistProvider: React.FC<any> = ({ children }) =>{
           });
           setAllSongList(updatedSongs);
         });
-   
+      }
+
+      function updateSongList(song: SongItem){
+        console.log(song);
+        const songToAdd: SongItem = {
+          category: song.category,
+          title: song.title,
+          added: false,
+          id: song.id
+        }
+        setAllSongList([...allSongList, songToAdd])
+        console.log('allSongList', allSongList);
+        console.log('songToAdd', songToAdd);
       }
   
       function removeSong(song: SongItem) {
+        console.log('id', song.id)
         deleteRecord(song.id).then(() => {
           const updatedSongs = songItemList.filter((item) => {
             return song.id !== item.id;
           });
           setSongList(updatedSongs);
-          const updatedAllList = allSongList.map((el) => {
-            if (el.id === song.id) {
-              return { ...el, added: false };
-            }
-            return el;
-          });
-          setAllSongList(updatedAllList);
+          deleteSongFromList(song.id);
         });
+      }
+
+     function deleteSongFromList(id: string){
+      const updatedAllList = allSongList.map((el) => {
+        if (el.id === id) {
+          return { ...el, added: false };
+        }
+        return el;
+      });
+      setAllSongList(updatedAllList);
       }
 
       useEffect(function () {
@@ -55,8 +72,6 @@ export const SonglistProvider: React.FC<any> = ({ children }) =>{
       const getSongList = () => {
         getSongListDb().then((res: SongListItem[]) => {
           getAll().then((songs: SongItem[]) => {
-            console.log('all', songs)
-            console.log('songListDb', songListDb)
             const updatedChoosenList = res.map((song) => {
               const isAdded = songs.some((item: SongItem) => item.id === song.id);
               return {
@@ -71,7 +86,7 @@ export const SonglistProvider: React.FC<any> = ({ children }) =>{
       }
 
     return(
-        <SongListContext.Provider  value={{addSong, removeSong, songItemList, allSongList }}>
+        <SongListContext.Provider  value={{addSong, removeSong, songItemList, allSongList, deleteSongFromList, updateSongList }}>
         {children}
         </SongListContext.Provider>
     )

@@ -8,11 +8,13 @@ import { useSongListContext } from "../context/SongListContext";
 import { Outlet, useNavigate } from "react-router-dom";
 import { collection, addDoc, serverTimestamp, getDocs, doc, getDoc, deleteDoc } from 'firebase/firestore'
 import { db } from '../firebase-config'
+import { useSongsDbContext } from "../context/firebaseContext";
 
 
 export const HomePage = () => {
   const categoriesList = categories;
   const collectionRef = collection(db, 'songs');
+  const { getCategoriesDb } = useSongsDbContext();
 
   const getData = async () => {
     const id = 'ZEL8bu0JyDntRZGJG4qk'
@@ -52,7 +54,7 @@ if ((await docSnap).exists()) {
   
 
   useEffect(() => {
-
+    getCategoriesDb()
     const getTodo = async () => {
       await getDocs(collectionRef).then((todo) => {
         console.log(todo.docs);

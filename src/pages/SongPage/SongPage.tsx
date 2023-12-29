@@ -9,6 +9,7 @@ import {SongView} from  "../../components/SongView/SongView"
 import { useSongsDbContext } from "../../context/firebaseContext";
 import { Button } from "@mui/material";
 import { useSongListContext } from "../../context/SongListContext";
+import AddSongDialog from "../../components/AddSongDialog/AddSongDialog";
 
 export const SongPage = () => {
   const { id } = useParams();
@@ -16,15 +17,17 @@ export const SongPage = () => {
   const [songDB, setSongDB] = useState<SongItem>();
   const [song, setSong] = useState<SongPageItem>();
   const { update, getByID } = useIndexedDB('songs');
-  const { removeSong } = useSongListContext();
+  const { deleteSongFromList, songItemList, removeSong } = useSongListContext();
   const { semitones, setValue } = useTransposeContext();
   const navigate = useNavigate();
 
   useEffect(() => {
     if(songListDb){
       const findedSong = songListDb?.find(song => song.id.toString() === id);
+      console.log('idd', id)
+      console.log('findedSong', findedSong)
       if(findedSong){
-        getSongDb(findedSong.id, findedSong.title).then(song =>{
+        getSongDb(findedSong.id).then(song =>{
           setSong(song);
           getByID(findedSong?.id).then((fromDb) => {
             setSongDB(fromDb);
@@ -52,9 +55,16 @@ export const SongPage = () => {
     console.log('idd', id)
     console.log('song', song)
     if(id && song)
-      await deleteSongDb(id, song?.id, song?.title);
+      await deleteSongDb(id, song?.id);
       //usunac tez z indexed db
-      removeSong({...song, id})
+      const checkIfInIndexesDb = songItemList.find((item: SongItem) => item.id === id);
+      console.log('checkIfInIndexesDb', checkIfInIndexesDb)
+      if(checkIfInIndexesDb){
+        removeSong(checkIfInIndexesDb);
+      }else {
+        deleteSongFromList(id);
+      }
+  
       navigate('/');
   }
 
@@ -64,10 +74,12 @@ export const SongPage = () => {
       {/* {song && <TransposeControl semitones={semitones} onSemitonesChange={updateSongList}></TransposeControl>} */}
         </div>
       {song && <SongView song={song}></SongView>}
-
-      <Button onClick={handleRemove} variant="contained" color="error">
+<div className="song__actions">
+<Button onClick={handleRemove} variant="contained" color="error">
   Delete
 </Button>
+<AddSongDialog song={song} id={id}></AddSongDialog>
+</div>
       </div>
   );
 };

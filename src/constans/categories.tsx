@@ -1,10 +1,9 @@
 export type Category = {
-id: number,
-key: string,
+id?: string,
 name: string
 }
 
-export const categories: Category[] = [
+export const categories: any[] = [
     {
         id: 1,
         key: 'thanksgiving',
