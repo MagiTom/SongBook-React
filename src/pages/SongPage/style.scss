@@ -23,5 +23,9 @@
             text-transform: uppercase;
         }
     }
+    &__actions{
+        display: flex;
+        gap: 2em;
+    }
 }
 

@@ -23,7 +23,7 @@ export const Chords: React.FC<any> = ({ children }) => {
     const result = [];
     const array = Array.from(chords)
     for (let i = 0; i < array.length; i++) {
-      if (array[i].trim() && array[i + 1].trim()) {
+      if (array[i]?.trim() && array[i + 1]?.trim()) {
         result.push(`${array[i].trim()}${array[i + 1].trim()}${array[i+2] ? array[i+2]: ''}`);
         array[i+2] ? i = i + 2 : i++;
       } else {

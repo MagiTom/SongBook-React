@@ -125,7 +125,6 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
 
   const deleteSongDb = async (docId: string, textId: string) => {
     try {
-      window.confirm("Are you sure you want to delete this song?");
       const documentRef = doc(db, "songs", docId);
       const questionRef = collection(db, `songs/${docId}/${docId}`);
       const documentRef2 = doc(questionRef, textId);

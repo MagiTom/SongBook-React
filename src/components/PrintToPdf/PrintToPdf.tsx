@@ -9,7 +9,7 @@ const PrintToPdf: React.FC<{ songs: SongPageItem[] }> = ({ songs }) => {
     const componentRef = useRef(null);
 
     const contentToPrint = songs.map(song => (
-        <SongView key={song.id} song={song} isPrintMode={true} />
+        <SongView inDb={true} key={song.id} song={song} id={song.id} isPrintMode={true} />
     ));
 
     return (

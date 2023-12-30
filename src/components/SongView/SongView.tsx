@@ -6,28 +6,50 @@ import { useTransposeContext } from "../../context/TransposeContext";
 import { TransposeControl } from "../TranponseControl/TransposeControl";
 import SongTitle from "../SongTitle/SongTitle";
 import "./style.scss";
+import { useIndexedDB } from "react-indexed-db-hook";
 
-export const SongView: React.FC<{song: SongPageItem, isPrintMode?: boolean}> = (props, isPrintMode = false) => {
+export const SongView: React.FC<{song: SongPageItem, inDb: boolean, id: string, isPrintMode?: boolean}> = (props, inDb = false, isPrintMode = false) => {
     const [songArr, setSongArr] = useState<string[] | undefined>([]);
     const [songItem, setSongItem] = useState<SongPageItem>();
-    const { semitones } = useTransposeContext();
+    const { update, getByID } = useIndexedDB('songs');
+    const { semitones, setValue } = useTransposeContext();
 
     useEffect(() => {
         const songItemEl = props.song;
         setSongItem(songItemEl);
         const pre = songItemEl?.text;
         let arr: string[] | undefined = pre?.split("\n");
-        console.log('text', arr)
+        console.log('songItemEl', songItemEl)
+        console.log('props', props.inDb)
         setSongArr(arr);
-      }, [props])
+
+        // getByID(props.song?.id).then((fromDb) => {
+        //   console.log('fromDb', fromDb)
+        //   setSongDB(fromDb);
+        //   if(fromDb){
+        //     setValue(+fromDb?.semitones);
+        //   }else {
+        //     setValue(0);
+        //   }
+        // });
+
+
+      }, [props.song.id])
     const changeSemiTones = (ev: number)=>{
-        console.log(ev)
+   
+      console.log('semitones', ev)
+      if (props.inDb) {
+        const songToUpdate = props.song;
+        const newUpdate = { semitones: `${ev}`, added: false, category: songToUpdate.category, title: songToUpdate.title, id: props.id };
+        console.log('newUpdate', newUpdate)
+        update(newUpdate);
+      }
     }
     return (
         <div className="song page-break">
         <div className="song__title">
         { !props.isPrintMode && <TransposeControl semitones={semitones} onSemitonesChange={changeSemiTones}></TransposeControl> }
-         {songItem && <SongTitle goToPage={()=> {}} key={songItem?.id} addSongToList={()=>{}} song={songItem} />}
+         {songItem && <h3>{songItem.title}</h3>}
 
           </div>
         <div className="song__items">

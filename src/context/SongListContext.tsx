@@ -45,23 +45,34 @@ export const SonglistProvider: React.FC<any> = ({ children }) =>{
       }
   
       function removeSong(song: SongItem) {
-        console.log('id', song.id)
+        console.log('songid', song.id)
         deleteRecord(song.id).then(() => {
           const updatedSongs = songItemList.filter((item) => {
             return song.id !== item.id;
           });
           setSongList(updatedSongs);
-          deleteSongFromList(song.id);
+          const updatedAllList = allSongList.map((el) => {
+            if (el.id === song.id) {
+              return { ...el, added: false };
+            }
+            return el;
+          });
+          setAllSongList(updatedAllList);
+        });
+      }
+
+      function deleteFromAllList(id: string){
+        deleteRecord(id).then(() => {
+          const updatedSongs = songItemList.filter((item) => {
+            return id !== item.id;
+          });
+          setSongList(updatedSongs);
+          deleteSongFromList(id)
         });
       }
 
      function deleteSongFromList(id: string){
-      const updatedAllList = allSongList.map((el) => {
-        if (el.id === id) {
-          return { ...el, added: false };
-        }
-        return el;
-      });
+      const updatedAllList = allSongList.filter((el) => el.id !== id);
       setAllSongList(updatedAllList);
       }
 
@@ -86,7 +97,7 @@ export const SonglistProvider: React.FC<any> = ({ children }) =>{
       }
 
     return(
-        <SongListContext.Provider  value={{addSong, removeSong, songItemList, allSongList, deleteSongFromList, updateSongList }}>
+        <SongListContext.Provider  value={{addSong, removeSong, songItemList, allSongList, deleteSongFromList, updateSongList, deleteFromAllList }}>
         {children}
         </SongListContext.Provider>
     )

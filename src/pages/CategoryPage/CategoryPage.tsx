@@ -13,7 +13,6 @@ export const CategoryPage = () => {
     const navigate = useNavigate();
     
     useEffect(() => {
-        console.log(category)
       const findSongByCategory = allSongList.filter((song: SongItem) => song.category === category);
       const chooseList = findSongByCategory.length ? findSongByCategory : allSongList;
       setSongListItems(chooseList);
