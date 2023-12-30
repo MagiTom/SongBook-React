@@ -1,6 +1,6 @@
 import { createContext, useState, useEffect, useContext } from 'react';
 import { useIndexedDB } from "react-indexed-db-hook";
-import { SongItem, SongList, SongListItem } from '../constans/songList';
+import { SongItem, SongList, SongListItem, SongPageItem } from '../constans/songList';
 import { useTransposeContext } from './TransposeContext';
 import { useSongsDbContext } from './firebaseContext';
 
@@ -9,15 +9,17 @@ const SongListContext: React.Context<any> = createContext([]);
 export const SonglistProvider: React.FC<any> = ({ children }) =>{
     const { getAll, add, deleteRecord } = useIndexedDB('songs');
     const { semitones } = useTransposeContext();
-    const { songListDb, getSongListDb } = useSongsDbContext();
-    const [songItemList, setSongList] = useState<SongItem[]>([]);
+    const { songListDb, getSongListDb, getSongDb } = useSongsDbContext();
+    const [songItemList, setSongList] = useState<SongPageItem[]>([]);
     const [allSongList, setAllSongList] = useState<SongItem[]>([]);
     const songList = SongList;
 
     function addSong(song: SongItem) {
+
+      getSongDb(song.id).then(item =>{
         console.log(song);
-        const songToAdd: SongItem = {
-          ...song, semitones 
+        const songToAdd: SongPageItem = {
+          ...song, semitones, text: item.text 
         }
         add(songToAdd).then(res => {
           setSongList([{...songToAdd, id: `${res}`}, ...songItemList]);
@@ -29,6 +31,7 @@ export const SonglistProvider: React.FC<any> = ({ children }) =>{
           });
           setAllSongList(updatedSongs);
         });
+      })
       }
 
       function updateSongList(song: SongItem){
@@ -82,7 +85,7 @@ export const SonglistProvider: React.FC<any> = ({ children }) =>{
     
       const getSongList = () => {
         getSongListDb().then((res: SongListItem[]) => {
-          getAll().then((songs: SongItem[]) => {
+          getAll().then((songs: SongPageItem[]) => {
             const updatedChoosenList = res.map((song) => {
               const isAdded = songs.some((item: SongItem) => item.id === song.id);
               return {

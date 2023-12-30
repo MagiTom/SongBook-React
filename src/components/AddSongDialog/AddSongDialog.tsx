@@ -30,6 +30,7 @@ export type SongProps = {
 const AddSongDialog: React.FC<SongProps> = (prop) => {
   const { addSongDb, updateSongDb } = useSongsDbContext();
   const [open, setOpen] = React.useState(false);
+  const [submitted, setSubmitted] = React.useState(false);
   const [title, setTitle] = React.useState<string>("");
   const [text, setText] = React.useState<string>("");
   const [category, setCategory] = React.useState<string>("");
@@ -57,6 +58,8 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
   };
 
   const handleAddSong = async () => {
+    setSubmitted(true);
+    if(title && category && text){
     const songToAdd: SongToAdd = {
       title,
       category,
@@ -66,6 +69,7 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
     console.log("idididididid", id);
     updateSongList({ ...songToAdd, id: id });
     handleClose();
+    }
   };
 
   const handleEditSong = async () => {
@@ -96,14 +100,13 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
   const deleteCategory = async (categoryItem: Category) => {
     // event.preventDefault();
     // event.stopPropagation();
-    await deleteCategoryDb(categoryItem?.id || '');
-    console.log(category)
+    await deleteCategoryDb(categoryItem?.id || "");
+    console.log(category);
     if (categoryItem.name === category) {
-      setCategory("")
+      setCategory("");
     } else {
       setCategory(category);
     }
-
   };
 
   return (
@@ -120,21 +123,27 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
         </Button>
       )}
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Subscribe</DialogTitle>
+        <DialogTitle>DODAJ UTWÓR</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            To subscribe to this website, please enter your email address here.
-            We will send updates occasionally.
+            <p className="example">
+              <span>Przykład:</span> <br />
+              G C Em D <br />
+              Mabuhay kayong mga di pangkaraniwan <br />
+            </p>
           </DialogContentText>
 
           <div className="category">
-            <FormControl fullWidth>
-              <InputLabel id="demo-simple-select-label">Category</InputLabel>
+            <FormControl
+              fullWidth
+              error={submitted && !category}
+            >
+              <InputLabel id="demo-simple-select-label">kategoria</InputLabel>
               <Select
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
                 value={category}
-                label="Category"
+                label="kategoria"
                 onChange={(event) => handleChangeCategory(event)}
               >
                 {categoriesDb.map((category) => (
@@ -163,22 +172,24 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
                   setNewCategory(event.target.value);
                 }}
                 value={newCategory}
-                label="category"
+                label="nowa kategoria"
                 margin="dense"
                 id="category"
               />
               <Button variant="contained" color="success" onClick={addCategory}>
-                Dodaj Kategorie
+                Dodaj Kategorię
               </Button>
             </div>
           </div>
           <TextField
             fullWidth
             variant="standard"
-            label="title"
+            label="tytuł"
             margin="dense"
             id="title"
             value={title}
+            error={submitted && !title}
+            helperText="Podaj Tytuł!"
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               setTitle(event.target.value);
             }}
@@ -186,7 +197,9 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
           <TextField
             margin="dense"
             id="text"
-            label="text"
+            label="tekst"
+            error={submitted && !text}
+            helperText="Podaj tekst!"
             value={text}
             multiline
             fullWidth
@@ -197,7 +210,7 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
+          <Button onClick={handleClose}>Anuluj</Button>
           {!editMode && <Button onClick={handleAddSong}>Dodaj</Button>}
           {editMode && <Button onClick={handleEditSong}>Edytuj</Button>}
         </DialogActions>

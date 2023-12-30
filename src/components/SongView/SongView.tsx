@@ -19,8 +19,8 @@ export const SongView: React.FC<{song: SongPageItem, inDb: boolean, id: string, 
         setSongItem(songItemEl);
         const pre = songItemEl?.text;
         let arr: string[] | undefined = pre?.split("\n");
-        console.log('songItemEl', songItemEl)
-        console.log('props', props.inDb)
+        console.log('songItemEl', arr)
+        console.log('isPrintMode', isPrintMode)
         setSongArr(arr);
 
         // getByID(props.song?.id).then((fromDb) => {
@@ -40,7 +40,7 @@ export const SongView: React.FC<{song: SongPageItem, inDb: boolean, id: string, 
       console.log('semitones', ev)
       if (props.inDb) {
         const songToUpdate = props.song;
-        const newUpdate = { semitones: `${ev}`, added: false, category: songToUpdate.category, title: songToUpdate.title, id: props.id };
+        const newUpdate = { semitones: `${ev}`, added: false, ...songToUpdate, id: props.id };
         console.log('newUpdate', newUpdate)
         update(newUpdate);
       }

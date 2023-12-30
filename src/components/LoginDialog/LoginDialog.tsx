@@ -10,15 +10,21 @@ import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { auth } from "../../firebase-config";
+import ErrorModal from "../ErrorModal/ErrorModal";
+import { useErrorContext } from "../../context/ErrorContext";
 
 const LoginDialog: React.FC<{isLogin: boolean}> = (props) => {
   const [open, setOpen] = React.useState(false);
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
+  // const [errorMessage, setErrorMessage] = useState("");
   const [password, setPassword] = useState("");
+  const { error, addError } = useErrorContext();
+
 
   const onLogin = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
+    // setErrorMessage('');
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         // Signed in
@@ -26,10 +32,12 @@ const LoginDialog: React.FC<{isLogin: boolean}> = (props) => {
         handleClose();
         console.log(user);
       })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log(errorCode, errorMessage);
+      .catch((error: any) => {
+        const errorCode = 'Błąd';
+        // setErrorMessage(error.message);
+        console.log('errorCode', error?.message);
+        addError(error?.message);
+     
       });
   };
 

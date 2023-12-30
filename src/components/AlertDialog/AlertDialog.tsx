@@ -41,7 +41,7 @@ interface AlertDialogProps {
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle id="alert-dialog-title">
-          {"Use Google's location service?"}
+          {"Usuwanie"}
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">

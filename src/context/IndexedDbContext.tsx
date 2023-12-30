@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import { Stores, addData, deleteData, getStoreData, initDB, updateData } from '../lib/db';
 import { SongItem, SongPageItem } from "../constans/songList";
 import { useIndexedDB } from "react-indexed-db-hook";
+import { useErrorContext } from "./ErrorContext";
 
 
 export interface IndexedDbModel {
@@ -25,6 +26,7 @@ const IndexedDbContext = React.createContext<IndexedDbModel>({
 export const IndexedDbProvider: React.FC<any> = ({ children }) => {
   const { getAll, add, deleteRecord } = useIndexedDB('songs');
   const [songList, setSongList] = useState<SongItem[] | undefined>();
+  const { error, addError } = useErrorContext();
   const handleInitDB = async () => {
     // const status = await initDB();
     // console.log(status);
@@ -46,12 +48,8 @@ export const IndexedDbProvider: React.FC<any> = ({ children }) => {
         console.log(res)
       });
       // refetch songs after creating data
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        // setError(err.message); // You can use this to handle errors if needed.
-      } else {
-        // setError('Something went wrong');
-      }
+    } catch (err: any) {
+      addError(err?.message);
     }
   };
 
@@ -63,12 +61,8 @@ export const IndexedDbProvider: React.FC<any> = ({ children }) => {
         getSongList();
       });
       // refetch songs after deleting data
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        // setError(err.message); // You can use this to handle errors if needed.
-      } else {
-        // setError('Something went wrong deleting the song');
-      }
+    } catch (err: any) {
+      addError(err?.message);
     }
   };
 
@@ -76,15 +70,15 @@ export const IndexedDbProvider: React.FC<any> = ({ children }) => {
     try {
    
       getSongList();
-    } catch (err: unknown) {
-      // Handle errors if needed.
+    } catch (err: any) {
+      addError(err?.message);
     }
   };
 
   const getSongList = async () => {
     getAll().then((songs: SongItem[]) => {
       setSongList(songs);
-    });
+    }).catch((err: any) => addError(err?.message));
   };
 
   // Call handleInitDB() to initialize the database when this component mounts

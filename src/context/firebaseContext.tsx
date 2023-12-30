@@ -17,6 +17,7 @@ import {
 import { db } from "../firebase-config";
 import { useSongListContext } from "./SongListContext";
 import { Category } from "../constans/categories";
+import { useErrorContext } from "./ErrorContext";
 
 export interface SongsDbModel {
   songListDb: SongListItem[] | undefined;
@@ -54,20 +55,22 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
   const [songDb, setSongDb] = useState<SongPageItem[] | undefined>();
   const collectionRef = collection(db, "songs");
   const collectionCategoryRef = collection(db, "categories");
+  const { error, addError } = useErrorContext();
 
   const getCategoriesDb = async (): Promise<void> => {
-     getDocs(collectionCategoryRef)
+    getDocs(collectionCategoryRef)
       .then((todo) => {
         let data: Category[] | any[] = todo.docs.map((doc) => ({
           ...doc.data(),
           id: doc.id,
         }));
-        console.log('data', data);
+        console.log("data", data);
         setCategoriesDb(data);
         // return data;
       })
       .catch((err) => {
         console.log(err);
+        addError(err?.message);
         // return [];
       });
   };
@@ -75,13 +78,15 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
   const addCategoryDb = async (category: Category) => {
     await addDoc(collectionCategoryRef, {
       ...category,
-    }).then((res) => {
-      setCategoriesDb([{ ...category, id: res.id }, ...categoriesDb]);
-    });
+    })
+      .then((res) => {
+        setCategoriesDb([{ ...category, id: res.id }, ...categoriesDb]);
+      })
+      .catch((err) => addError(err?.message));
   };
   const deleteCategoryDb = async (id: string) => {
     const documentRef = doc(db, "categories", id);
-    await deleteDoc(documentRef);
+    await deleteDoc(documentRef).catch((err) => addError(err?.message));
     setCategoriesDb(categoriesDb.filter((item) => item.id !== id));
   };
 
@@ -89,15 +94,17 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
     const docRef = doc(db, "songs", id);
     const docSnap = getDoc(docRef);
     const songRef = collection(db, `songs/${docRef.id}/${docRef.id}`);
-    return getDocs(songRef).then(async (todo) => {
-      let data = todo.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
-      const songToDb: SongItem | any = {
-        ...(await docSnap).data(),
-        ...data[0],
-      };
-      setSongDb(songToDb);
-      return songToDb;
-    });
+    return getDocs(songRef)
+      .then(async (todo) => {
+        let data = todo.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+        const songToDb: SongItem | any = {
+          ...(await docSnap).data(),
+          ...data[0],
+        };
+        setSongDb(songToDb);
+        return songToDb;
+      })
+      .catch((err) => addError(err?.message));
   };
 
   const addSongDb = async (song: SongToAdd) => {
@@ -114,12 +121,8 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
       });
       // Create a new document in sub-collection `general`
       // refetch songs after creating data
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        // setError(err.message); // You can use this to handle errors if needed.
-      } else {
-        // setError('Something went wrong');
-      }
+    } catch (err: any) {
+      addError(err?.message)
     }
   };
 
@@ -131,8 +134,8 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
       await deleteDoc(documentRef2);
       await deleteDoc(documentRef);
       setSongListDb(songListDb?.filter((item) => item.id !== docId));
-    } catch (err) {
-      console.log(err);
+    } catch (err: any) {
+      addError(err?.message)
     }
   };
 
@@ -151,8 +154,8 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
       const documentRef2 = doc(questionRef, song.id);
       await updateDoc(documentRef, songToAdd);
       await updateDoc(documentRef2, { text: song.text });
-    } catch (err: unknown) {
-      // Handle errors if needed.
+    } catch (err: any) {
+      addError(err?.message)
     }
   };
 
@@ -167,8 +170,8 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
         setSongListDb(data);
         return data;
       })
-      .catch((err) => {
-        console.log(err);
+      .catch((err: any) => {
+        addError(err?.message)
         return [];
       });
   };

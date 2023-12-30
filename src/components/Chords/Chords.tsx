@@ -15,13 +15,17 @@ export const Chords: React.FC<any> = ({ children }) => {
     setShowTooltip(null);
   };
 
-  const chords: string = children.replace(/\w+/g, (chord: string) =>
-    Chord.transpose(chord, Interval.fromSemitones(semitones))
+  const chords: string = children.replace(/\w+/g, (chord: string) => {
+    console.log('replace', chord);
+   return Chord.transpose(chord, Interval.fromSemitones(semitones))
+  }
+ 
   )
 
   const chordsArr = (): string[] =>{
     const result = [];
     const array = Array.from(chords)
+
     for (let i = 0; i < array.length; i++) {
       if (array[i]?.trim() && array[i + 1]?.trim()) {
         result.push(`${array[i].trim()}${array[i + 1].trim()}${array[i+2] ? array[i+2]: ''}`);

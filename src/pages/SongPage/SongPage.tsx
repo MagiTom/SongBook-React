@@ -77,11 +77,9 @@ export const SongPage = () => {
         <AlertDialog
           confirmAction={handleRemove}
           button={
-            <IconButton aria-label="delete">
-              <Button variant="contained" color="error">
-                Delete
+              <Button variant="outlined" color="error">
+                Usuń
               </Button>
-            </IconButton>
           }
         ></AlertDialog>
         <AddSongDialog song={song} id={id}></AddSongDialog>

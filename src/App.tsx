@@ -32,6 +32,10 @@ import LoginDialog from './components/LoginDialog/LoginDialog';
 import { useEffect, useState } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
 import { auth } from './firebase-config';
+import { ListItem } from '@mui/material';
+import { useSongsDbContext } from './context/firebaseContext';
+import { useErrorContext } from './context/ErrorContext';
+import ErrorModal from './components/ErrorModal/ErrorModal';
 
 
 initDB(DBConfig);
@@ -40,14 +44,14 @@ const lightTheme = createTheme({
   palette: {
     mode: 'light',
     primary: {
-      main: '#7D994F',
-      dark: '#4c6337',
+      main: '#44803F',
+      dark: '#146152',
     },
     secondary: {
-      main: '#666666',
+      main: '#B4CF66',
     },
     error: {
-      main: '#fbf9f9ff'
+      main: '#FF5A33'
     }
   },
 });
@@ -108,9 +112,15 @@ export default function PersistentDrawerLeft() {
   const [open1, setOpen1] = React.useState(true);
   const [open2, setOpen2] = React.useState(true);
   const [user, setUser] = useState<User | null>();
+  const { getCategoriesDb } = useSongsDbContext();
+  const { error, addError } = useErrorContext();
   const [currentMode, setCurrentMode] = React.useState<'light' | 'dark'>('light'); // Track the current mode
   const navigate = useNavigate();
   // const user = auth.currentUser;
+
+  useEffect(() => {
+    getCategoriesDb();
+    }, [])
 
   useEffect(()=>{
     onAuthStateChanged(auth, (user) => {
@@ -192,8 +202,21 @@ export default function PersistentDrawerLeft() {
             ))}
           </List>
           <Divider />
-         { user && <AddSongDialog></AddSongDialog> }
+          {/* <List className="footer">
+            <ListItem>
+            { user && <AddSongDialog></AddSongDialog> }
+            </ListItem>
+            <ListItem>
+            <LoginDialog isLogin={!!user?.uid}></LoginDialog>
+            </ListItem>
+          </List> */}
+
+          {error && <ErrorModal message={error}></ErrorModal>}
+
+          <div className="footer">
+          { user && <AddSongDialog></AddSongDialog> }
           <LoginDialog isLogin={!!user?.uid}></LoginDialog>
+          </div>
         </Drawer>
 
         <AppBar position="fixed" open1={open1} open2={open2}>
@@ -211,7 +234,7 @@ export default function PersistentDrawerLeft() {
               Śpiewnik Uwielbieniowy
               <MusicNoteIcon></MusicNoteIcon>
             </Typography>
-            <Typography className='drawerTitle' variant="h6" sx={{ flexGrow: 1 }} noWrap component="div">
+            <Typography color="secondary" className='drawerEmail' variant="h6" sx={{ flexGrow: 1 }} noWrap component="div">
               {user?.email}
             </Typography>
            

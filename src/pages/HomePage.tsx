@@ -17,10 +17,6 @@ export const HomePage = () => {
   const { getCategoriesDb } = useSongsDbContext();
   const { categoriesDb, deleteCategoryDb, addCategoryDb } = useSongsDbContext();
 
-  useEffect(() => {
-    getCategoriesDb();
-    }, [])
-
   const navigate = useNavigate();
   const goToCategory = (category: string) =>{
     return navigate(`/${category}`);
