@@ -16,7 +16,6 @@ export const Chords: React.FC<any> = ({ children }) => {
   };
 
   const chords: string = children.replace(/\w+/g, (chord: string) => {
-    console.log('replace', chord);
    return Chord.transpose(chord, Interval.fromSemitones(semitones))
   }
  

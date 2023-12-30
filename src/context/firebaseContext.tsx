@@ -154,6 +154,7 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
       const documentRef2 = doc(questionRef, song.id);
       await updateDoc(documentRef, songToAdd);
       await updateDoc(documentRef2, { text: song.text });
+      setSongListDb([...(songListDb || []), { ...songToAdd, id: docId }]);
     } catch (err: any) {
       addError(err?.message)
     }

@@ -7,12 +7,14 @@ import { TransposeControl } from "../TranponseControl/TransposeControl";
 import SongTitle from "../SongTitle/SongTitle";
 import "./style.scss";
 import { useIndexedDB } from "react-indexed-db-hook";
+import { useSongsDbContext } from "../../context/firebaseContext";
 
 export const SongView: React.FC<{song: SongPageItem, inDb: boolean, id: string, isPrintMode?: boolean}> = (props, inDb = false, isPrintMode = false) => {
     const [songArr, setSongArr] = useState<string[] | undefined>([]);
     const [songItem, setSongItem] = useState<SongPageItem>();
     const { update, getByID } = useIndexedDB('songs');
     const { semitones, setValue } = useTransposeContext();
+    const { songListDb, getSongDb, deleteSongDb } = useSongsDbContext();
 
     useEffect(() => {
         const songItemEl = props.song;

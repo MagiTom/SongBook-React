@@ -21,6 +21,7 @@ import { useSongsDbContext } from "../../context/firebaseContext";
 import { SongPageItem, SongToAdd } from "../../constans/songList";
 import { useSongListContext } from "../../context/SongListContext";
 import AlertDialog from "../AlertDialog/AlertDialog";
+import { useNavigate } from "react-router-dom";
 
 export type SongProps = {
   song?: SongPageItem;
@@ -36,11 +37,13 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
   const [category, setCategory] = React.useState<string>("");
   const [newCategory, setNewCategory] = React.useState<string>("");
   const [editMode, setEditMode] = React.useState<boolean>(false);
-  const { updateSongList } = useSongListContext();
+  const { updateSongList, editSongList } = useSongListContext();
   const { categoriesDb, deleteCategoryDb, addCategoryDb } = useSongsDbContext();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("sssssss", prop.song?.id);
+    console.log("sssssss11", prop.song?.id);
+    console.log("sssssss222", prop?.id);
     if (prop.song?.id) {
       setEditMode(true);
       setTitle(prop.song?.title);
@@ -80,6 +83,8 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
       id: prop.song?.id || "",
     };
     await updateSongDb(prop?.id || "", prop.song?.title || "", songToAdd);
+    console.log(' prop.song',  prop.song)
+    editSongList(songToAdd, prop.id);  //dokkonczyc
     handleClose();
   };
 
