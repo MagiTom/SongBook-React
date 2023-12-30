@@ -28,6 +28,10 @@ import MusicNoteIcon from '@mui/icons-material/MusicNote';
 import './App.css'
 import { useSongListContext } from './context/SongListContext';
 import AddSongDialog from './components/AddSongDialog/AddSongDialog';
+import LoginDialog from './components/LoginDialog/LoginDialog';
+import { useEffect, useState } from 'react';
+import { User, onAuthStateChanged } from 'firebase/auth';
+import { auth } from './firebase-config';
 
 
 initDB(DBConfig);
@@ -103,8 +107,29 @@ export default function PersistentDrawerLeft() {
   const { addSong, removeSong, songItemList, allSongList } = useSongListContext();
   const [open1, setOpen1] = React.useState(true);
   const [open2, setOpen2] = React.useState(true);
+  const [user, setUser] = useState<User | null>();
   const [currentMode, setCurrentMode] = React.useState<'light' | 'dark'>('light'); // Track the current mode
   const navigate = useNavigate();
+  // const user = auth.currentUser;
+
+  useEffect(()=>{
+    onAuthStateChanged(auth, (user) => {
+      setUser(user);
+        if (user) {
+          // User is signed in, see docs for a list of available properties
+          // https://firebase.google.com/docs/reference/js/firebase.User
+      
+          const uid = user.uid;
+          // ...
+          console.log("uid", uid)
+        } else {
+          // User is signed out
+          // ...
+          console.log("user is logged out")
+        }
+      });
+     
+}, [user])
 
     const handleDrawerOpen = (drawer: NavDraver) => {
       if (drawer === 'drawer1') {
@@ -167,7 +192,8 @@ export default function PersistentDrawerLeft() {
             ))}
           </List>
           <Divider />
-          <AddSongDialog></AddSongDialog>
+         { user && <AddSongDialog></AddSongDialog> }
+          <LoginDialog isLogin={!!user?.uid}></LoginDialog>
         </Drawer>
 
         <AppBar position="fixed" open1={open1} open2={open2}>
@@ -181,9 +207,12 @@ export default function PersistentDrawerLeft() {
             >
               <MenuIcon />
             </IconButton>
-            <Typography className='drawerTitle' onClick={() => goToPage('/')} variant="h6" sx={{ flexGrow: 1 }} noWrap component="div">
+            <Typography className='drawerTitle' onClick={() => goToPage('/')} variant="h6" sx={{ flexGrow: 2 }} noWrap component="div">
               Śpiewnik Uwielbieniowy
               <MusicNoteIcon></MusicNoteIcon>
+            </Typography>
+            <Typography className='drawerTitle' variant="h6" sx={{ flexGrow: 1 }} noWrap component="div">
+              {user?.email}
             </Typography>
            
             <IconButton onClick={toggleMode}>{currentMode === 'light' ? <Brightness5Icon/> : <Brightness4Icon />}</IconButton>

@@ -14,6 +14,7 @@ import { Button, IconButton } from "@mui/material";
 import { useSongListContext } from "../../context/SongListContext";
 import AddSongDialog from "../../components/AddSongDialog/AddSongDialog";
 import AlertDialog from "../../components/AlertDialog/AlertDialog";
+import { auth } from "../../firebase-config";
 
 export const SongPage = () => {
   const { id } = useParams();
@@ -25,6 +26,7 @@ export const SongPage = () => {
     useSongListContext();
   const { semitones, setValue } = useTransposeContext();
   const navigate = useNavigate();
+  const user = auth.currentUser;
 
   useEffect(() => {
     if (songListDb) {
@@ -71,7 +73,7 @@ export const SongPage = () => {
   return (
     <div className="song">
       {song && <SongView id={id || ""} song={song} inDb={!!songDB}></SongView>}
-      <div className="song__actions">
+    {user &&  <div className="song__actions">
         <AlertDialog
           confirmAction={handleRemove}
           button={
@@ -83,7 +85,7 @@ export const SongPage = () => {
           }
         ></AlertDialog>
         <AddSongDialog song={song} id={id}></AddSongDialog>
-      </div>
+      </div>} 
     </div>
   );
 };
