@@ -42,8 +42,6 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("sssssss11", prop.song?.id);
-    console.log("sssssss222", prop?.id);
     if (prop.song?.id) {
       setEditMode(true);
       setTitle(prop.song?.title);
@@ -69,7 +67,6 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
       text,
     };
     const id = await addSongDb(songToAdd);
-    console.log("idididididid", id);
     updateSongList({ ...songToAdd, id: id });
     handleClose();
     }
@@ -83,13 +80,11 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
       id: prop.song?.id || "",
     };
     await updateSongDb(prop?.id || "", prop.song?.title || "", songToAdd);
-    console.log(' prop.song',  prop.song)
-    editSongList(songToAdd, prop.id);  //dokkonczyc
+    editSongList(songToAdd, prop.id);
     handleClose();
   };
 
   const handleChangeCategory = (event: SelectChangeEvent) => {
-    console.log("eeeeeeee", event);
     event.stopPropagation();
     event.preventDefault();
     setCategory(event.target.value);
@@ -103,8 +98,6 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
     setNewCategory("");
   };
   const deleteCategory = async (categoryItem: Category) => {
-    // event.preventDefault();
-    // event.stopPropagation();
     await deleteCategoryDb(categoryItem?.id || "");
     console.log(category);
     if (categoryItem.name === category) {

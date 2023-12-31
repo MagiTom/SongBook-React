@@ -5,7 +5,7 @@ import {
 } from "../../context/TransposeContext";
 import { TransposeControl } from "../../components/TranponseControl/TransposeControl";
 import "./style.scss";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SongItem, SongList, SongPageItem } from "../../constans/songList";
 import { useIndexedDB } from "react-indexed-db-hook";
 import { SongView } from "../../components/SongView/SongView";
@@ -28,17 +28,14 @@ export const SongPage = () => {
   const navigate = useNavigate();
   const user = auth.currentUser;
 
+
   useEffect(() => {
     if (songListDb) {
       const findedSong = songListDb?.find((song) => song.id.toString() === id);
-      console.log("idd", id);
-      console.log("findedSong", findedSong);
-      console.log("songItemList", songItemList);
       if (findedSong) {
         getSongDb(findedSong.id).then((song) => {
           setSong(song);
           getByID(findedSong?.id).then((fromDb) => {
-            console.log("fromDb", fromDb);
             setSongDB(fromDb);
             if (fromDb) {
               setValue(+fromDb?.semitones);

@@ -8,24 +8,11 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    height: 100%;
-    &__items{
-        column-count: 2;
-    }
 
-    &__title{
-        position: relative;
-        width: 100%;
-        text-align: center;
-        p{
-            margin-top: 0;
-            font-size: 1.1rem;
-            text-transform: uppercase;
-        }
-    }
     &__actions{
         display: flex;
         gap: 2em;
+        margin-top: 2em;
     }
 }
 

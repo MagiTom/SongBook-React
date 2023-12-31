@@ -52,9 +52,6 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
   }
 
   function editSongList(song: SongPageItem, id: string) {
-    console.log("id =>>", id);
-    console.log("songToAdd =>>", song);
-    console.log("allSongList =>>", allSongList);
     const songToAdd: SongItem = {
       category: song.category,
       title: song.title,

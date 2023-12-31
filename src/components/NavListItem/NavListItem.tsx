@@ -36,10 +36,10 @@ export const NavListItem: React.FC<NavListItemProps> = ({ song, goToPage, addToL
 
   return (
     <>
-      <ListItem onClick={() => goToPage()}>
+      <ListItem sx={{pt: 0, pb: 0, pr: 0, pl: 0.5}} onClick={() => goToPage()}>
     {addToList && <Tooltip title="Dodaj" arrow><ListItemIcon className={song?.added ? 'hidden' : ''} onClick={handleAddToList}>{<AddCircleIcon />}</ListItemIcon></Tooltip>}
     {removeSong && <Tooltip title="Usuń" arrow><ListItemIcon onClick={handleRemoveSong}>{<RemoveCircleIcon />}</ListItemIcon></Tooltip>}
-        <ListItemButton>
+        <ListItemButton sx={{padding: 0.5}}>
           <ListItemText primary={song.title} />
         </ListItemButton>
       </ListItem>

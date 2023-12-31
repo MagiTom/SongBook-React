@@ -54,6 +54,12 @@ const lightTheme = createTheme({
       main: '#FF5A33'
     }
   },
+    typography: {
+    allVariants: {
+      fontFamily: 'Raleway, Arial',
+      lineHeight: 1
+    }
+  },
 });
 
 const darkTheme = createTheme({

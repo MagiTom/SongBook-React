@@ -1,7 +1,7 @@
-
+import "./style.scss";
 
 export const Lyrics: React.FC<any> = ({ children }) => {
-    return <pre>{children}</pre>
+    return <pre className="lyric">{children}</pre>
 }
 
 export default Lyrics;
