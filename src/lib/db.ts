@@ -40,7 +40,6 @@ export const addData = <T>(storeName: string, data: T): Promise<T|string|null> =
     request = indexedDB.open('myDB', version);
 
     request.onsuccess = () => {
-      console.log('request.onsuccess - addData', data);
       db = request.result;
       const tx = db.transaction(storeName, 'readwrite');
       const store = tx.objectStore(storeName);
@@ -64,7 +63,6 @@ export const deleteData = (storeName: string, key: string): Promise<boolean> => 
     request = indexedDB.open('myDB', version);
 
     request.onsuccess = () => {
-      console.log('request.onsuccess - deleteData', key);
       db = request.result;
       const tx = db.transaction(storeName, 'readwrite');
       const store = tx.objectStore(storeName);
@@ -84,7 +82,6 @@ export const updateData = <T>(storeName: string, key: string, data: T): Promise<
     request = indexedDB.open('myDB', version);
 
     request.onsuccess = () => {
-      console.log('request.onsuccess - updateData', key);
       db = request.result;
       const tx = db.transaction(storeName, 'readwrite');
       const store = tx.objectStore(storeName);
@@ -106,7 +103,6 @@ export const getStoreData = <T>(storeName: Stores): Promise<T[]> => {
     request = indexedDB.open('myDB');
 
     request.onsuccess = () => {
-      console.log('request.onsuccess - getAllData');
       db = request.result;
       const tx = db.transaction(storeName, 'readonly');
       const store = tx.objectStore(storeName);

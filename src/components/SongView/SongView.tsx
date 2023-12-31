@@ -1,13 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { SongItem, SongPageItem } from "../../constans/songList";
+import { useIndexedDB } from "react-indexed-db-hook";
+import { SongPageItem } from "../../constans/songList";
+import { useTransposeContext } from "../../context/TransposeContext";
+import { useSongsDbContext } from "../../context/firebaseContext";
 import { Chords } from "../Chords/Chords";
 import Lyrics from "../Lyrics/Lyrics";
-import { useTransposeContext } from "../../context/TransposeContext";
 import { TransposeControl } from "../TranponseControl/TransposeControl";
-import SongTitle from "../SongTitle/SongTitle";
 import "./style.scss";
-import { useIndexedDB } from "react-indexed-db-hook";
-import { useSongsDbContext } from "../../context/firebaseContext";
 
 export const SongView: React.FC<{
   song: SongPageItem;
@@ -32,7 +31,9 @@ export const SongView: React.FC<{
     }
   }, [songArr]);
 
-  const columnCountStyle = isOverflowing ? { columnCount: 2 } : { columnCount: 1 };
+  const columnCountStyle = isOverflowing
+    ? { columnCount: 2 }
+    : { columnCount: 1 };
 
   useEffect(() => {
     const songItemEl = props.song;
@@ -41,8 +42,8 @@ export const SongView: React.FC<{
     let arr: string[] | undefined = pre?.split("\n");
     for (let i = 0; i < arr.length - 1; i++) {
       if (arr[i] === "" && arr[i + 1] !== "" && arr[i - 1] !== "") {
-        arr.splice(i + 1, 0, ""); // Wstaw pusty ciąg za elementem pustym
-        i++; // Przesuń wskaźnik o jeden, ponieważ dodaliśmy nowy pusty ciąg
+        arr.splice(i + 1, 0, "");
+        i++;
       }
     }
     setSongArr(arr);
@@ -70,13 +71,13 @@ export const SongView: React.FC<{
         )}
         {songItem && <h3>{songItem.title}</h3>}
       </div>
-      <div className="song__items"  style={columnCountStyle}>
+      <div className="song__items" style={columnCountStyle}>
         {songArr &&
           songArr.map((songEl, index) => (
             <div className="song__item" key={songEl + index}>
-              {index % 2 === 0 && <Chords>{songEl}</Chords> }
-              {songEl === "" && index % 2 !== 0 && <br/>}
-             {index % 2 !== 0 &&  <Lyrics>{songEl}</Lyrics> }
+              {index % 2 === 0 && <Chords>{songEl}</Chords>}
+              {songEl === "" && index % 2 !== 0 && <br />}
+              {index % 2 !== 0 && <Lyrics>{songEl}</Lyrics>}
             </div>
           ))}
       </div>

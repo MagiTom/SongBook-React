@@ -1,11 +1,6 @@
-import { createContext, useState, useEffect, useContext } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useIndexedDB } from "react-indexed-db-hook";
-import {
-  SongItem,
-  SongList,
-  SongListItem,
-  SongPageItem,
-} from "../constans/songList";
+import { SongItem, SongListItem, SongPageItem } from "../constans/songList";
 import { useTransposeContext } from "./TransposeContext";
 import { useSongsDbContext } from "./firebaseContext";
 
@@ -14,10 +9,10 @@ const SongListContext: React.Context<any> = createContext([]);
 export const SonglistProvider: React.FC<any> = ({ children }) => {
   const { getAll, add, deleteRecord } = useIndexedDB("songs");
   const { semitones } = useTransposeContext();
-  const { songListDb, getSongListDb, getSongDb } = useSongsDbContext();
+  const { getSongListDb, getSongDb } = useSongsDbContext();
   const [songItemList, setSongList] = useState<SongPageItem[]>([]);
   const [allSongList, setAllSongList] = useState<SongItem[]>([]);
-  const songList = SongList;
+  const [selectedIndex, setSelectedIndex] = useState<string>();
 
   function addSong(song: SongItem) {
     getSongDb(song.id).then((item) => {
@@ -59,7 +54,6 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
       id,
     };
 
-    // const i = allSongList.findIndex((x: SongItem) => x.id === id);
     const updateAllSong = allSongList.map((el) => {
       if (el.id === id) {
         return songToAdd;
@@ -68,7 +62,7 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
     });
     const updateSongs = songItemList.map((el) => {
       if (el.id === id) {
-        return {...song, id};
+        return { ...song, id };
       }
       return el;
     });
@@ -139,6 +133,8 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
         updateSongList,
         deleteFromAllList,
         editSongList,
+        setSelectedIndex,
+        selectedIndex,
       }}
     >
       {children}

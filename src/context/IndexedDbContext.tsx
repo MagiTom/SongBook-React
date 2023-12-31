@@ -1,17 +1,15 @@
 import React, { useContext, useState } from "react";
-import { Stores, addData, deleteData, getStoreData, initDB, updateData } from '../lib/db';
-import { SongItem, SongPageItem } from "../constans/songList";
 import { useIndexedDB } from "react-indexed-db-hook";
+import { SongItem, SongPageItem } from "../constans/songList";
 import { useErrorContext } from "./ErrorContext";
 
-
 export interface IndexedDbModel {
-  songList: SongItem[] | undefined,
-  handleInitDB: () => Promise<void>,
-  addSong: (song: SongPageItem) => Promise<void>,
-  deleteSong: (id: string) => Promise<void>,
-  updateSong: (id: string, updatedSong: SongItem) => Promise<void>,
-  getSongList: () => Promise<void>,
+  songList: SongItem[] | undefined;
+  handleInitDB: () => Promise<void>;
+  addSong: (song: SongPageItem) => Promise<void>;
+  deleteSong: (id: string) => Promise<void>;
+  updateSong: (id: string, updatedSong: SongItem) => Promise<void>;
+  getSongList: () => Promise<void>;
 }
 
 const IndexedDbContext = React.createContext<IndexedDbModel>({
@@ -24,14 +22,10 @@ const IndexedDbContext = React.createContext<IndexedDbModel>({
 });
 
 export const IndexedDbProvider: React.FC<any> = ({ children }) => {
-  const { getAll, add, deleteRecord } = useIndexedDB('songs');
+  const { getAll, add, deleteRecord } = useIndexedDB("songs");
   const [songList, setSongList] = useState<SongItem[] | undefined>();
-  const { error, addError } = useErrorContext();
-  const handleInitDB = async () => {
-    // const status = await initDB();
-    // console.log(status);
-    // setIsDBReady(!!status); // If needed, you can uncomment this line.
-  };
+  const { addError } = useErrorContext();
+  const handleInitDB = async () => {};
 
   const addSong = async (song: SongPageItem) => {
     const songToAdd = {
@@ -43,11 +37,10 @@ export const IndexedDbProvider: React.FC<any> = ({ children }) => {
 
     try {
       console.log(song);
-      add(songToAdd).then(res => {
+      add(songToAdd).then((res) => {
         getSongList();
-        console.log(res)
+        console.log(res);
       });
-      // refetch songs after creating data
     } catch (err: any) {
       addError(err?.message);
     }
@@ -55,12 +48,11 @@ export const IndexedDbProvider: React.FC<any> = ({ children }) => {
 
   const deleteSong = async (id: string) => {
     try {
-      console.log(id)
+      console.log(id);
       deleteRecord(id).then((event) => {
-        console.log(event)
+        console.log(event);
         getSongList();
       });
-      // refetch songs after deleting data
     } catch (err: any) {
       addError(err?.message);
     }
@@ -68,7 +60,6 @@ export const IndexedDbProvider: React.FC<any> = ({ children }) => {
 
   const updateSong = async (id: string, updatedSong: SongItem) => {
     try {
-   
       getSongList();
     } catch (err: any) {
       addError(err?.message);
@@ -76,16 +67,23 @@ export const IndexedDbProvider: React.FC<any> = ({ children }) => {
   };
 
   const getSongList = async () => {
-    getAll().then((songs: SongItem[]) => {
-      setSongList(songs);
-    }).catch((err: any) => addError(err?.message));
+    getAll()
+      .then((songs: SongItem[]) => {
+        setSongList(songs);
+      })
+      .catch((err: any) => addError(err?.message));
   };
-
-  // Call handleInitDB() to initialize the database when this component mounts
 
   return (
     <IndexedDbContext.Provider
-      value={{ songList, handleInitDB, addSong, deleteSong, updateSong, getSongList }}
+      value={{
+        songList,
+        handleInitDB,
+        addSong,
+        deleteSong,
+        updateSong,
+        getSongList,
+      }}
     >
       {children}
     </IndexedDbContext.Provider>

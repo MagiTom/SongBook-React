@@ -1,40 +1,46 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { Outlet, useNavigate, useParams } from "react-router-dom";
 import CategoryButton from "../components/CategoryButton/CategoryButton";
-import { categories } from "../constans/categories";
-import "./style.scss";
-import { SongItem, SongList } from "../constans/songList";
-import SongTitle from "../components/SongTitle/SongTitle";
-import { useSongListContext } from "../context/SongListContext";
-import { Outlet, useNavigate } from "react-router-dom";
-import { collection, addDoc, serverTimestamp, getDocs, doc, getDoc, deleteDoc } from 'firebase/firestore'
-import { db } from '../firebase-config'
 import { useSongsDbContext } from "../context/firebaseContext";
-
+import "./style.scss";
 
 export const HomePage = () => {
-  const categoriesList = categories;
-  const collectionRef = collection(db, 'songs');
-  const { getCategoriesDb } = useSongsDbContext();
-  const { categoriesDb, deleteCategoryDb, addCategoryDb } = useSongsDbContext();
+  const { category } = useParams();
+  const { categoriesDb } = useSongsDbContext();
+  const [categoryItem, setCategoryItem] = useState<string>();
+  const all = "all";
+
+  useEffect(() => {
+    setCategoryItem(category);
+  }, []);
 
   const navigate = useNavigate();
-  const goToCategory = (category: string) =>{
+  const goToCategory = (category: string) => {
+    setCategoryItem(category);
     return navigate(`/${category}`);
-  }
+  };
 
   return (
     <div className="home">
       <div className="categories">
         {categoriesDb.map((category) => (
           <CategoryButton
-            key={category.id} 
+            marked={category.name === categoryItem}
+            key={category.id}
             category={category}
-            getCategory={() => goToCategory(category.name)} 
+            getCategory={() => goToCategory(category.name)}
           />
         ))}
+        {
+          <CategoryButton
+            marked={!categoryItem}
+            category={{ id: all, name: "wszystkie" }}
+            getCategory={() => goToCategory("")}
+          />
+        }
       </div>
       <div className="songs">
-      <Outlet />
+        <Outlet />
       </div>
     </div>
   );

@@ -1,27 +1,27 @@
-import React, { RefObject, useEffect, useRef } from "react";
-import Button from "@mui/material/Button";
 import DeleteIcon from "@mui/icons-material/Delete";
-import "./style.scss";
-import { Category } from "../../constans/categories";
 import {
   Dialog,
-  DialogTitle,
+  DialogActions,
   DialogContent,
   DialogContentText,
-  TextField,
-  DialogActions,
+  DialogTitle,
   FormControl,
+  IconButton,
   InputLabel,
   MenuItem,
   Select,
   SelectChangeEvent,
-  IconButton,
+  TextField,
 } from "@mui/material";
-import { useSongsDbContext } from "../../context/firebaseContext";
+import Button from "@mui/material/Button";
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Category } from "../../constans/categories";
 import { SongPageItem, SongToAdd } from "../../constans/songList";
 import { useSongListContext } from "../../context/SongListContext";
+import { useSongsDbContext } from "../../context/firebaseContext";
 import AlertDialog from "../AlertDialog/AlertDialog";
-import { useNavigate } from "react-router-dom";
+import "./style.scss";
 
 export type SongProps = {
   song?: SongPageItem;
@@ -60,15 +60,16 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
 
   const handleAddSong = async () => {
     setSubmitted(true);
-    if(title && category && text){
-    const songToAdd: SongToAdd = {
-      title,
-      category,
-      text,
-    };
-    const id = await addSongDb(songToAdd);
-    updateSongList({ ...songToAdd, id: id });
-    handleClose();
+    if (title && category && text) {
+      const songToAdd: SongToAdd = {
+        title,
+        category,
+        text,
+      };
+      const id = await addSongDb(songToAdd);
+      updateSongList({ ...songToAdd, id: id });
+      clearData();
+      handleClose();
     }
   };
 
@@ -79,8 +80,9 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
       text,
       id: prop.song?.id || "",
     };
-    await updateSongDb(prop?.id || "", prop.song?.title || "", songToAdd);
+    await updateSongDb(prop?.id || "", songToAdd);
     editSongList(songToAdd, prop.id);
+    clearData();
     handleClose();
   };
 
@@ -105,6 +107,12 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
     } else {
       setCategory(category);
     }
+  };
+  const clearData = () => {
+    setTitle("");
+    setText("");
+    setCategory("");
+    setSubmitted(false);
   };
 
   return (
@@ -132,10 +140,7 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
           </DialogContentText>
 
           <div className="category">
-            <FormControl
-              fullWidth
-              error={submitted && !category}
-            >
+            <FormControl fullWidth error={submitted && !category}>
               <InputLabel id="demo-simple-select-label">kategoria</InputLabel>
               <Select
                 labelId="demo-simple-select-label"
@@ -187,7 +192,7 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
             id="title"
             value={title}
             error={submitted && !title}
-            helperText="Podaj Tytuł!"
+            helperText={submitted && !title ? "Podaj Tytuł!" : ''}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               setTitle(event.target.value);
             }}
@@ -197,7 +202,7 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
             id="text"
             label="tekst"
             error={submitted && !text}
-            helperText="Podaj tekst!"
+            helperText={submitted && !text ? "Podaj tekst!" : ''}
             value={text}
             multiline
             fullWidth

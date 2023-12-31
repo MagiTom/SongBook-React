@@ -5,10 +5,11 @@ import { Category } from "../../constans/categories";
 interface CategoryButtonProps {
   category: Category;
   getCategory: (category: Category) => void;
+  marked: boolean;
 }
 
 const CategoryButton: React.FC<CategoryButtonProps> = (props) => {
-  return <Button onClick={() => props.getCategory(props.category)} variant="outlined">{props.category.name}</Button>;
+  return <Button disableElevation onClick={() => props.getCategory(props.category)} variant={props.marked ? "contained" : "outlined"}>{props.category.name}</Button>;
 };
 
 export default CategoryButton;

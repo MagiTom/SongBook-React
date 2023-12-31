@@ -1,10 +1,3 @@
-import React, { useContext, useState } from "react";
-import {
-  SongItem,
-  SongListItem,
-  SongPageItem,
-  SongToAdd,
-} from "../constans/songList";
 import {
   addDoc,
   collection,
@@ -14,9 +7,15 @@ import {
   getDocs,
   updateDoc,
 } from "firebase/firestore";
-import { db } from "../firebase-config";
-import { useSongListContext } from "./SongListContext";
+import React, { useContext, useState } from "react";
 import { Category } from "../constans/categories";
+import {
+  SongItem,
+  SongListItem,
+  SongPageItem,
+  SongToAdd,
+} from "../constans/songList";
+import { db } from "../firebase-config";
 import { useErrorContext } from "./ErrorContext";
 
 export interface SongsDbModel {
@@ -25,11 +24,7 @@ export interface SongsDbModel {
   addSongDb: (song: SongToAdd) => Promise<void>;
   getSongDb: (id: string) => Promise<SongListItem | any>;
   deleteSongDb: (docId: string, textId: string) => Promise<void>;
-  updateSongDb: (
-    docId: string,
-    title: string,
-    song: SongPageItem
-  ) => Promise<void>;
+  updateSongDb: (docId: string, song: SongPageItem) => Promise<void>;
   getSongListDb: () => Promise<SongListItem[] | any[]>;
   getCategoriesDb: () => Promise<void>;
   addCategoryDb: (category: Category) => Promise<void>;
@@ -66,12 +61,10 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
         }));
         console.log("data", data);
         setCategoriesDb(data);
-        // return data;
       })
       .catch((err) => {
         console.log(err);
         addError(err?.message);
-        // return [];
       });
   };
 
@@ -115,14 +108,12 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
     try {
       return addDoc(collectionRef, songToAdd).then(async (res: any) => {
         const questionRef = collection(db, `songs/${res.id}/${res.id}`);
-        await addDoc(questionRef, { text: song.text });
+        await addDoc(questionRef, { text: song.text, title: song.title });
         setSongListDb([...(songListDb || []), { ...songToAdd, id: res.id }]);
         return res.id;
       });
-      // Create a new document in sub-collection `general`
-      // refetch songs after creating data
     } catch (err: any) {
-      addError(err?.message)
+      addError(err?.message);
     }
   };
 
@@ -135,15 +126,11 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
       await deleteDoc(documentRef);
       setSongListDb(songListDb?.filter((item) => item.id !== docId));
     } catch (err: any) {
-      addError(err?.message)
+      addError(err?.message);
     }
   };
 
-  const updateSongDb = async (
-    docId: string,
-    title: string,
-    song: SongPageItem
-  ) => {
+  const updateSongDb = async (docId: string, song: SongPageItem) => {
     try {
       const songToAdd = {
         category: song.category,
@@ -153,10 +140,10 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
       const questionRef = collection(db, `songs/${docId}/${docId}`);
       const documentRef2 = doc(questionRef, song.id);
       await updateDoc(documentRef, songToAdd);
-      await updateDoc(documentRef2, { text: song.text });
+      await updateDoc(documentRef2, { text: song.text, title: song.title });
       setSongListDb([...(songListDb || []), { ...songToAdd, id: docId }]);
     } catch (err: any) {
-      addError(err?.message)
+      addError(err?.message);
     }
   };
 
@@ -172,12 +159,10 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
         return data;
       })
       .catch((err: any) => {
-        addError(err?.message)
+        addError(err?.message);
         return [];
       });
   };
-
-  // Call handleInitDB() to initialize the database when this component mounts
 
   return (
     <SongsDbContext.Provider

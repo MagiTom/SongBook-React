@@ -1,35 +1,35 @@
-import { useNavigate, useParams } from "react-router-dom";
-import {
-  TransposeProvider,
-  useTransposeContext,
-} from "../../context/TransposeContext";
-import { TransposeControl } from "../../components/TranponseControl/TransposeControl";
-import "./style.scss";
-import { useEffect, useRef, useState } from "react";
-import { SongItem, SongList, SongPageItem } from "../../constans/songList";
+import { Button } from "@mui/material";
+import { useEffect, useState } from "react";
 import { useIndexedDB } from "react-indexed-db-hook";
-import { SongView } from "../../components/SongView/SongView";
-import { useSongsDbContext } from "../../context/firebaseContext";
-import { Button, IconButton } from "@mui/material";
-import { useSongListContext } from "../../context/SongListContext";
+import { useNavigate, useParams } from "react-router-dom";
 import AddSongDialog from "../../components/AddSongDialog/AddSongDialog";
 import AlertDialog from "../../components/AlertDialog/AlertDialog";
+import { SongView } from "../../components/SongView/SongView";
+import { SongItem, SongPageItem } from "../../constans/songList";
+import { useSongListContext } from "../../context/SongListContext";
+import { useTransposeContext } from "../../context/TransposeContext";
+import { useSongsDbContext } from "../../context/firebaseContext";
 import { auth } from "../../firebase-config";
+import "./style.scss";
 
 export const SongPage = () => {
   const { id } = useParams();
   const { songListDb, getSongDb, deleteSongDb } = useSongsDbContext();
   const [songDB, setSongDB] = useState<SongItem>();
   const [song, setSong] = useState<SongPageItem>();
-  const { update, getByID } = useIndexedDB("songs");
-  const { deleteSongFromList, songItemList, deleteFromAllList } =
-    useSongListContext();
-  const { semitones, setValue } = useTransposeContext();
+  const { getByID } = useIndexedDB("songs");
+  const {
+    deleteSongFromList,
+    songItemList,
+    deleteFromAllList,
+    setSelectedIndex,
+  } = useSongListContext();
+  const { setValue } = useTransposeContext();
   const navigate = useNavigate();
   const user = auth.currentUser;
 
-
   useEffect(() => {
+    setSelectedIndex(id);
     if (songListDb) {
       const findedSong = songListDb?.find((song) => song.id.toString() === id);
       if (findedSong) {
@@ -48,12 +48,6 @@ export const SongPage = () => {
     }
   }, [id, songItemList]);
 
-  const updateSongList = (ev: number) => {
-    if (songDB) {
-      update({ ...songDB, semitones: `${ev}` });
-    }
-  };
-
   const handleRemove = async () => {
     if (id && song) await deleteSongDb(id, song?.id);
     if (songDB) {
@@ -67,17 +61,19 @@ export const SongPage = () => {
   return (
     <div className="song">
       {song && <SongView id={id || ""} song={song} inDb={!!songDB}></SongView>}
-    {user &&  <div className="song__actions">
-        <AlertDialog
-          confirmAction={handleRemove}
-          button={
+      {user && (
+        <div className="song__actions">
+          <AlertDialog
+            confirmAction={handleRemove}
+            button={
               <Button variant="outlined" color="error">
                 Usuń
               </Button>
-          }
-        ></AlertDialog>
-        <AddSongDialog song={song} id={id}></AddSongDialog>
-      </div>} 
+            }
+          ></AlertDialog>
+          <AddSongDialog song={song} id={id}></AddSongDialog>
+        </div>
+      )}
     </div>
   );
 };

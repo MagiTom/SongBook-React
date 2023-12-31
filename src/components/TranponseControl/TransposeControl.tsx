@@ -1,13 +1,14 @@
-
-import { useTransposeContext } from "../../context/TransposeContext";
-import IconButton from "@mui/material/IconButton";
-import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import IconButton from "@mui/material/IconButton";
+import { useTransposeContext } from "../../context/TransposeContext";
 import "./styles.scss";
 
-
-export const TransposeControl: React.FC<any> = ({ semitones, onSemitonesChange }) => {
+export const TransposeControl: React.FC<any> = ({
+  semitones,
+  onSemitonesChange,
+}) => {
   const { reset, decrement, increment } = useTransposeContext();
   const isUnison = semitones === 0;
 
@@ -17,7 +18,7 @@ export const TransposeControl: React.FC<any> = ({ semitones, onSemitonesChange }
   };
   const decrementing = () => {
     decrement();
-    onSemitonesChange(semitones - 1); 
+    onSemitonesChange(semitones - 1);
   };
   const incrementing = () => {
     increment();

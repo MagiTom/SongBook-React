@@ -1,9 +1,7 @@
-import React from "react";
-import Button from "@mui/material/Button";
-import { Category } from "../../constans/categories";
-import { SongItem } from "../../constans/songList";
-import IconButton from "@mui/material/IconButton";
 import AddIcon from '@mui/icons-material/Add';
+import IconButton from "@mui/material/IconButton";
+import React from "react";
+import { SongItem } from "../../constans/songList";
 import "./style.scss";
 
 export interface SongItemProp {
@@ -25,7 +23,7 @@ const SongTitle: React.FC<SongItemProp> = (props) => {
   };
 
 
-  return (<div onClick={goPage} className="songTitle"><IconButton className={props.song.added ? 'hidden' : ''} onClick={addToList} color="secondary" aria-label="add an alarm">
+  return (<div onClick={goPage} className="songTitle"><IconButton sx={{padding: 0.5}} className={props.song.added ? 'hidden' : ''} onClick={addToList} color="secondary" aria-label="add an alarm">
   <AddIcon />
 </IconButton><p>{props.song.title}</p></div>);
 };

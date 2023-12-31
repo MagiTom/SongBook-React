@@ -1,20 +1,21 @@
-import * as React from 'react';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
+import * as React from "react";
 
 interface AlertDialogProps {
-    // isOpen: boolean;
-    confirmAction: () => void;
-    button: string | any
-  }
- const AlertDialog: React.FC<AlertDialogProps> = (props) =>{
+  confirmAction: () => void;
+  button: string | any;
+}
+const AlertDialog: React.FC<AlertDialogProps> = (props) => {
   const [open, setOpen] = React.useState(false);
 
-  const handleClickOpen = (event:  React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const handleClickOpen = (
+    event: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ) => {
     event.stopPropagation();
     event.preventDefault();
     setOpen(true);
@@ -27,22 +28,17 @@ interface AlertDialogProps {
     props.confirmAction();
     setOpen(false);
   };
-  
 
   return (
     <React.Fragment>
-      <div onClick={(event)=>handleClickOpen(event)}>
-        {props.button}
-      </div>
+      <div onClick={(event) => handleClickOpen(event)}>{props.button}</div>
       <Dialog
         open={open}
         onClose={handleClose}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">
-          {"Usuwanie"}
-        </DialogTitle>
+        <DialogTitle id="alert-dialog-title">{"Usuwanie"}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
             Czy na pewno chcesz usunąć element?
@@ -57,6 +53,6 @@ interface AlertDialogProps {
       </Dialog>
     </React.Fragment>
   );
-}
+};
 
 export default AlertDialog;
