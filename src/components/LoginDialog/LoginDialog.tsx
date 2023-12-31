@@ -17,7 +17,7 @@ const LoginDialog: React.FC<{ isLogin: boolean }> = (props) => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { error, addError } = useErrorContext();
+  const { addError } = useErrorContext();
 
   const onLogin = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
@@ -44,7 +44,7 @@ const LoginDialog: React.FC<{ isLogin: boolean }> = (props) => {
       .then(() => {
         navigate("/");
       })
-      .catch((error) => {
+      .catch(() => {
         // An error happened.
       });
   };

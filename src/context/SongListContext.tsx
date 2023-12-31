@@ -102,10 +102,6 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
     setAllSongList(updatedAllList);
   }
 
-  useEffect(function () {
-    getSongList();
-  }, []);
-
   const getSongList = () => {
     getSongListDb().then((res: SongListItem[]) => {
       getAll().then((songs: SongPageItem[]) => {
@@ -121,6 +117,13 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
       });
     });
   };
+
+  useEffect(function () {
+    getSongList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+
 
   return (
     <SongListContext.Provider

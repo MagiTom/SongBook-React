@@ -135,7 +135,7 @@ export default function PersistentDrawerLeft() {
     getCategoriesDb();
     const mode: ModeType = localStorage.getItem("currentMode") as ModeType;
     setCurrentMode(mode || "light");
-  }, []);
+  }, [getCategoriesDb]);
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {

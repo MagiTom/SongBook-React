@@ -47,10 +47,9 @@ const SongsDbContext = React.createContext<SongsDbModel>({
 export const SongsDbProvider: React.FC<any> = ({ children }) => {
   const [songListDb, setSongListDb] = useState<SongListItem[] | undefined>();
   const [categoriesDb, setCategoriesDb] = useState<Category[]>([]);
-  const [songDb, setSongDb] = useState<SongPageItem[] | undefined>();
   const collectionRef = collection(db, "songs");
   const collectionCategoryRef = collection(db, "categories");
-  const { error, addError } = useErrorContext();
+  const { addError } = useErrorContext();
 
   const getCategoriesDb = async (): Promise<void> => {
     getDocs(collectionCategoryRef)
@@ -59,7 +58,6 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
           ...doc.data(),
           id: doc.id,
         }));
-        console.log("data", data);
         setCategoriesDb(data);
       })
       .catch((err) => {
@@ -94,7 +92,6 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
           ...(await docSnap).data(),
           ...data[0],
         };
-        setSongDb(songToDb);
         return songToDb;
       })
       .catch((err) => addError(err?.message));

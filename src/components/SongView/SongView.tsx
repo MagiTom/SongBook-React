@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { useIndexedDB } from "react-indexed-db-hook";
 import { SongPageItem } from "../../constans/songList";
 import { useTransposeContext } from "../../context/TransposeContext";
-import { useSongsDbContext } from "../../context/firebaseContext";
 import { Chords } from "../Chords/Chords";
 import Lyrics from "../Lyrics/Lyrics";
 import { TransposeControl } from "../TranponseControl/TransposeControl";
@@ -16,10 +15,8 @@ export const SongView: React.FC<{
 }> = (props, inDb = false, isPrintMode = false) => {
   const [songArr, setSongArr] = useState<string[] | undefined>([]);
   const [songItem, setSongItem] = useState<SongPageItem>();
-  const { update, getByID } = useIndexedDB("songs");
-  const { semitones, setValue } = useTransposeContext();
-  const { songListDb, getSongDb, deleteSongDb } = useSongsDbContext();
-
+  const { update } = useIndexedDB("songs");
+  const { semitones } = useTransposeContext();
   const [isOverflowing, setIsOverflowing] = useState(false);
   const textRef = useRef<any>(null);
   useEffect(() => {

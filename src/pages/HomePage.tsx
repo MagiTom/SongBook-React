@@ -12,7 +12,7 @@ export const HomePage = () => {
 
   useEffect(() => {
     setCategoryItem(category);
-  }, []);
+  }, [category]);
 
   const navigate = useNavigate();
   const goToCategory = (category: string) => {

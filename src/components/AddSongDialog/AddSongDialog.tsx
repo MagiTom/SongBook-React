@@ -15,7 +15,6 @@ import {
 } from "@mui/material";
 import Button from "@mui/material/Button";
 import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { Category } from "../../constans/categories";
 import { SongPageItem, SongToAdd } from "../../constans/songList";
 import { useSongListContext } from "../../context/SongListContext";
@@ -39,7 +38,6 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
   const [editMode, setEditMode] = React.useState<boolean>(false);
   const { updateSongList, editSongList } = useSongListContext();
   const { categoriesDb, deleteCategoryDb, addCategoryDb } = useSongsDbContext();
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (prop.song?.id) {
@@ -48,7 +46,7 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
       setText(prop.song.text);
       setCategory(prop.song.category);
     }
-  }, [prop.song?.id]);
+  }, [prop.song?.id, prop.song?.category, prop.song?.text, prop.song?.title]);
 
   const handleClickOpen = () => {
     setOpen(true);

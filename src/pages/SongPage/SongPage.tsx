@@ -46,6 +46,7 @@ export const SongPage = () => {
         });
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, songItemList]);
 
   const handleRemove = async () => {
