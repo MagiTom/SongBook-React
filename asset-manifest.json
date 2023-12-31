@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/MagiTom/SongBook-React/static/css/main.62caacd5.css",
+    "main.js": "/MagiTom/SongBook-React/static/js/main.a64b024b.js",
+    "index.html": "/MagiTom/SongBook-React/index.html",
+    "main.62caacd5.css.map": "/MagiTom/SongBook-React/static/css/main.62caacd5.css.map",
+    "main.a64b024b.js.map": "/MagiTom/SongBook-React/static/js/main.a64b024b.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.62caacd5.css",
+    "static/js/main.a64b024b.js"
+  ]
+}
