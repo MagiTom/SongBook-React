@@ -32,25 +32,6 @@ export const SongView: React.FC<{
     }
   }, [songArr]);
 
-  // useEffect(() => {
-  //   function checkTextOverflow() {
-  //     const element = textRef.current;
-  //     if (element && element.offsetHeight > window.innerHeight) {
-  //       setIsOverflowing(true);
-  //     } else {
-  //       setIsOverflowing(false);
-  //     }
-  //     console.log('element', element)
-  //     console.log('element', element.getBoundingClientRect())
-  //     console.log('window.innerHeigh', window.innerHeight)
-  //   }
-
-  //   window.addEventListener('resize', checkTextOverflow);
-  //   return () => {
-  //     window.removeEventListener('resize', checkTextOverflow);
-  //   };
-  // }, []);
-
   const columnCountStyle = isOverflowing ? { columnCount: 2 } : { columnCount: 1 };
 
   useEffect(() => {
@@ -65,7 +46,7 @@ export const SongView: React.FC<{
       }
     }
     setSongArr(arr);
-  }, [props.song.id]);
+  }, [props.song]);
   const changeSemiTones = (ev: number) => {
     if (props.inDb) {
       const songToUpdate = props.song;

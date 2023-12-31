@@ -56,9 +56,6 @@ export const SongPage = () => {
 
   const handleRemove = async () => {
     if (id && song) await deleteSongDb(id, song?.id);
-    //usunac tez z indexed db
-    // const checkIfInIndexesDb = songItemList.find((item: SongItem) => item.id === id);
-    // console.log('checkIfInIndexesDb', checkIfInIndexesDb)
     if (songDB) {
       deleteFromAllList(songDB.id);
     } else {

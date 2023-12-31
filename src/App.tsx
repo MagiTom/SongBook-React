@@ -208,14 +208,6 @@ export default function PersistentDrawerLeft() {
             ))}
           </List>
           <Divider />
-          {/* <List className="footer">
-            <ListItem>
-            { user && <AddSongDialog></AddSongDialog> }
-            </ListItem>
-            <ListItem>
-            <LoginDialog isLogin={!!user?.uid}></LoginDialog>
-            </ListItem>
-          </List> */}
 
           {error && <ErrorModal message={error}></ErrorModal>}
 
