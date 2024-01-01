@@ -11,6 +11,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useErrorContext } from "../../context/ErrorContext";
 import { auth } from "../../firebase-config";
+import { VisibilityOff, Visibility } from "@mui/icons-material";
+import { InputAdornment, IconButton } from "@mui/material";
 
 const LoginDialog: React.FC<{ isLogin: boolean }> = (props) => {
   const [open, setOpen] = React.useState(false);
@@ -18,6 +20,13 @@ const LoginDialog: React.FC<{ isLogin: boolean }> = (props) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { addError } = useErrorContext();
+  const [showPassword, setShowPassword] = React.useState(false);
+
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+  };
 
   const onLogin = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
@@ -62,17 +71,16 @@ const LoginDialog: React.FC<{ isLogin: boolean }> = (props) => {
         </Button>
       )}
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Subscribe</DialogTitle>
+        <DialogTitle>LOGOWANIE</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            To subscribe to this website, please enter your email address here.
-            We will send updates occasionally.
+            Zaloguj się jako administrator, aby móc dodawać lub edytować teksty.
           </DialogContentText>
           <TextField
             autoFocus
             margin="dense"
             id="name"
-            label="Email Address"
+            label="Email"
             type="email"
             fullWidth
             variant="standard"
@@ -83,15 +91,29 @@ const LoginDialog: React.FC<{ isLogin: boolean }> = (props) => {
             margin="dense"
             id="password"
             label="Hasło"
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             fullWidth
             variant="standard"
+            InputProps={{
+              endAdornment:
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={handleClickShowPassword}
+                    onMouseDown={handleMouseDownPassword}
+                    edge="end"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              
+            }}
             onChange={(e) => setPassword(e.target.value)}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={(event) => onLogin(event)}>Subscribe</Button>
+          <Button onClick={handleClose}>anuluj</Button>
+          <Button onClick={(event) => onLogin(event)}>zaloguj się</Button>
         </DialogActions>
       </Dialog>
     </React.Fragment>
