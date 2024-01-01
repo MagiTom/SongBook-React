@@ -25,7 +25,7 @@ export interface SongsDbModel {
   getSongDb: (id: string) => Promise<SongListItem | any>;
   deleteSongDb: (docId: string, textId: string) => Promise<void>;
   updateSongDb: (docId: string, song: SongPageItem) => Promise<void>;
-  getSongListDb: () => Promise<SongListItem[] | any[]>;
+  getSongListDb: () => Promise<SongPageItem[]>;
   getCategoriesDb: () => Promise<void>;
   addCategoryDb: (category: Category) => Promise<void>;
   deleteCategoryDb: (id: string) => Promise<void>;
@@ -132,6 +132,9 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
       const songToAdd = {
         category: song.category,
         title: song.title,
+        added: song?.added,
+        text: song?.text,
+        semitones: song?.semitones
       };
       const documentRef = doc(db, "songs", docId);
       const questionRef = collection(db, `songs/${docId}/${docId}`);
@@ -144,10 +147,10 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
     }
   };
 
-  const getSongListDb = async (): Promise<SongListItem[] | any[]> => {
+  const getSongListDb = async (): Promise<SongPageItem[]> => {
     return getDocs(collectionRef)
       .then((todo) => {
-        let data: SongListItem[] | any[] = todo.docs.map((doc) => ({
+        let data: SongPageItem[] | any[] = todo.docs.map((doc) => ({
           ...doc.data(),
           id: doc.id,
         }));

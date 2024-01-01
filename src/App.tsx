@@ -128,6 +128,7 @@ export default function PersistentDrawerLeft() {
   const [open2, setOpen2] = React.useState(true);
   const [user, setUser] = useState<User | null>();
   const { getCategoriesDb } = useSongsDbContext();
+  const { getSongList, getSongListAdmin, updateSongAdmin } = useSongListContext();
   const { error } = useErrorContext();
   const [currentMode, setCurrentMode] = React.useState<ModeType>("light"); // Track the current mode
   const navigate = useNavigate();
@@ -147,6 +148,12 @@ export default function PersistentDrawerLeft() {
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       setUser(user);
+      if(!user){
+        getSongList();
+      } else {
+        getSongListAdmin();
+      }
+
     });
   }, [user]);
 
@@ -173,11 +180,19 @@ export default function PersistentDrawerLeft() {
   };
 
   function handleAddSong(song: SongItem) {
-    addSong(song);
+    if(!user){
+      addSong(song);
+    } else {
+      updateSongAdmin(song, true)
+    }
   }
 
   function handleRemoveSong(song: SongItem) {
-    removeSong(song);
+    if(!user){
+      removeSong(song);
+    } else {
+      updateSongAdmin(song, false, true);
+    }
   }
 
   const toggleMode = () => {

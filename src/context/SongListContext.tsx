@@ -3,16 +3,18 @@ import { useIndexedDB } from "react-indexed-db-hook";
 import { SongItem, SongListItem, SongPageItem } from "../constans/songList";
 import { useTransposeContext } from "./TransposeContext";
 import { useSongsDbContext } from "./firebaseContext";
+import { auth } from "../firebase-config";
 
 const SongListContext: React.Context<any> = createContext([]);
 
 export const SonglistProvider: React.FC<any> = ({ children }) => {
   const { getAll, add, deleteRecord } = useIndexedDB("songs");
   const { semitones } = useTransposeContext();
-  const { getSongListDb, getSongDb } = useSongsDbContext();
+  const { getSongListDb, getSongDb, updateSongDb } = useSongsDbContext();
   const [songItemList, setSongList] = useState<SongPageItem[]>([]);
   const [allSongList, setAllSongList] = useState<SongItem[]>([]);
   const [selectedIndex, setSelectedIndex] = useState<string>();
+  const user = auth.currentUser;
 
   function addSong(song: SongItem) {
     getSongDb(song.id).then((item) => {
@@ -23,15 +25,61 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
         text: item.text,
       };
       add(songToAdd).then((res) => {
+        // add to panel right
         setSongList([{ ...songToAdd, id: `${res}` }, ...songItemList]);
         const updatedSongs = allSongList.map((el) => {
-          if (el.id === song.id) {
+          if (el.id === songToAdd.id) {
             return { ...el, added: true };
           }
           return el;
         });
+         // add to panel left
         setAllSongList(updatedSongs);
       });
+    });
+  }
+
+  function updateSongAdmin(song: SongItem, added: boolean, deleteMode = false) {
+    getSongDb(song.id).then((item) => {
+      console.log(song);
+      const songToAdd: SongPageItem = {
+        ...song,
+        semitones,
+        text: item.text,
+        added,
+        id: item.id
+      };
+
+      updateSongDb(song.id, songToAdd).then(() =>{
+        const updateAllSong = allSongList.map((el) => {
+          if (el.id === song.id) {
+            return songToAdd;
+          }
+          return el;
+        });
+        setAllSongList([...updateAllSong]);
+        if(deleteMode){
+          const updatedSongs = songItemList.filter((item) => {
+            return song.id !== item.id;
+          });
+          setSongList(updatedSongs);
+        }  else {
+          setSongList([...songItemList, songToAdd]);
+        }
+      })
+
+      // add(songToAdd).then((res) => {
+      //   // add to panel right
+      //   setSongList([{ ...songToAdd, id: `${res}` }, ...songItemList]);
+      //   const updatedSongs = allSongList.map((el) => {
+      //     if (el.id === songToAdd.id) {
+      //       return { ...el, added: true };
+      //     }
+      //     return el;
+      //   });
+      //    // add to panel left
+      //   setAllSongList(updatedSongs);
+      // });
     });
   }
 
@@ -103,7 +151,7 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
   }
 
   const getSongList = () => {
-    getSongListDb().then((res: SongListItem[]) => {
+    getSongListDb().then((res: SongPageItem[] | any[]) => {
       getAll().then((songs: SongPageItem[]) => {
         const updatedChoosenList = res.map((song) => {
           const isAdded = songs.some((item: SongItem) => item.id === song.id);
@@ -112,17 +160,23 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
             added: isAdded,
           };
         });
+        // add to panle left
         setAllSongList(updatedChoosenList);
+        // add to panel left
         setSongList(songs);
       });
     });
   };
 
-  useEffect(function () {
-    getSongList();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
+  const getSongListAdmin = () => {
+    getSongListDb().then((res: SongPageItem[]) => {
+      // add to panle left
+      setAllSongList(res);
+      const panelLeftList = res.filter(item => item?.added)
+      // add to panel left
+      setSongList(panelLeftList);
+    });
+  };
 
 
   return (
@@ -130,6 +184,7 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
       value={{
         addSong,
         removeSong,
+        getSongList,
         songItemList,
         allSongList,
         deleteSongFromList,
@@ -138,6 +193,8 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
         editSongList,
         setSelectedIndex,
         selectedIndex,
+        updateSongAdmin,
+        getSongListAdmin
       }}
     >
       {children}
