@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Chord, Interval } from "tonal";
 import { useTransposeContext } from "../../context/TransposeContext";
 import "./style.scss";
+import { ChordDisplay, getChordByName } from "@magicdidac/chord-display";
 
 export const Chords: React.FC<any> = ({ children }) => {
   const { semitones } = useTransposeContext();
@@ -52,17 +53,23 @@ export const Chords: React.FC<any> = ({ children }) => {
             <div
               style={{
                 position: "absolute",
+                zIndex: 10000,
                 bottom: "100%",
                 left: "50%",
                 transform: "translateX(-50%)",
                 background: "#fff",
-                padding: "5px",
+                padding: "2px",
                 border: "1px solid #ccc",
                 borderRadius: "5px",
                 boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
+                width: '100px',
+                height: 'auto'
               }}
             >
-              {/* <GuitarChord chord={'C'} /> */}
+              <ChordDisplay
+                chord={getChordByName(chord)}
+                // {/* chord={Chords.C} */}
+              />
             </div>
           )}
         </span>
