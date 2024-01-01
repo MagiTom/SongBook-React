@@ -24,11 +24,17 @@ const LoginDialog: React.FC<{ isLogin: boolean }> = (props) => {
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
-  const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleMouseDownPassword = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
     event.preventDefault();
   };
 
-  const onLogin = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const onLogin = (
+    e:
+      | React.MouseEvent<HTMLButtonElement, MouseEvent>
+      | React.KeyboardEvent<HTMLDivElement>
+  ) => {
     e.preventDefault();
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
@@ -57,6 +63,12 @@ const LoginDialog: React.FC<{ isLogin: boolean }> = (props) => {
         // An error happened.
       });
   };
+  function handleKeyPress(event: React.KeyboardEvent<HTMLDivElement>) {
+    const key = event.key;
+    if (key === "Enter") {
+      onLogin(event);
+    }
+  }
 
   return (
     <React.Fragment>
@@ -87,15 +99,16 @@ const LoginDialog: React.FC<{ isLogin: boolean }> = (props) => {
             onChange={(e) => setEmail(e.target.value)}
           />
           <TextField
+            onKeyPress={(e) => handleKeyPress(e)}
             autoFocus
             margin="dense"
             id="password"
             label="Hasło"
-            type={showPassword ? 'text' : 'password'}
+            type={showPassword ? "text" : "password"}
             fullWidth
             variant="standard"
             InputProps={{
-              endAdornment:
+              endAdornment: (
                 <InputAdornment position="end">
                   <IconButton
                     aria-label="toggle password visibility"
@@ -106,7 +119,7 @@ const LoginDialog: React.FC<{ isLogin: boolean }> = (props) => {
                     {showPassword ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
                 </InputAdornment>
-              
+              ),
             }}
             onChange={(e) => setPassword(e.target.value)}
           />

@@ -16,15 +16,7 @@ export const Chords: React.FC<any> = ({ children }) => {
   };
 
   const chords: string = children.replace(/\w+/g, (chord: string) => {
-    let chordToTraspose = chord;
-    if (chord === chord.toLocaleLowerCase()) {
-      chordToTraspose = chord.toLocaleUpperCase() + "m";
-      const partChord = "is";
-      if (chord.includes(partChord)) {
-        chordToTraspose = chord.replace(partChord, "").toUpperCase() + "#";
-      }
-    }
-    return Chord.transpose(chordToTraspose, Interval.fromSemitones(semitones));
+    return Chord.transpose(chord, Interval.fromSemitones(semitones));
   });
 
   const chordsArr = (): string[] => {

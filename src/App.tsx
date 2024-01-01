@@ -37,7 +37,7 @@ import { useSongListContext } from "./context/SongListContext";
 import { useSongsDbContext } from "./context/firebaseContext";
 import { auth } from "./firebase-config";
 import { DBConfig } from "./lib/DBConfig";
-import { useMediaQuery } from "@mui/material";
+import { ListItem, useMediaQuery } from "@mui/material";
 
 type ModeType = "light" | "dark";
 
@@ -131,17 +131,17 @@ export default function PersistentDrawerLeft() {
   const { error } = useErrorContext();
   const [currentMode, setCurrentMode] = React.useState<ModeType>("light"); // Track the current mode
   const navigate = useNavigate();
-  const matches = useMediaQuery('(max-width: 480px)');
+  const matches = useMediaQuery("(max-width: 480px)");
 
   useEffect(() => {
     getCategoriesDb();
     const mode: ModeType = localStorage.getItem("currentMode") as ModeType;
-    if(matches){
+    if (matches) {
       setOpen1(false);
       setOpen2(false);
     }
     setCurrentMode(mode || "light");
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -168,7 +168,7 @@ export default function PersistentDrawerLeft() {
 
   const goToPage = (id: string) => {
     setSelectedIndex(id);
-    const url = id ? `/song/${id}` : '/';
+    const url = id ? `/song/${id}` : "/";
     return navigate(url);
   };
 
@@ -225,15 +225,19 @@ export default function PersistentDrawerLeft() {
                 key={song.id}
               ></NavListItem>
             ))}
+
           </List>
           <Divider />
-
+    
+          <List style={{ bottom: 0, position: 'fixed', background: currentMode === 'dark' ? '#121212' : 'white' }}>
+          <ListItem>
+              <div className="footer">
+                {user && <AddSongDialog></AddSongDialog>}
+                <LoginDialog isLogin={!!user?.uid}></LoginDialog>
+              </div>
+            </ListItem>
+          </List>
           {error && <ErrorModal message={error}></ErrorModal>}
-
-          <div className="footer">
-            {user && <AddSongDialog></AddSongDialog>}
-            <LoginDialog isLogin={!!user?.uid}></LoginDialog>
-          </div>
         </Drawer>
 
         <AppBar position="fixed" open1={open1} open2={open2}>

@@ -147,7 +147,6 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
   const getSongListDb = async (): Promise<SongListItem[] | any[]> => {
     return getDocs(collectionRef)
       .then((todo) => {
-        console.log(todo.docs);
         let data: SongListItem[] | any[] = todo.docs.map((doc) => ({
           ...doc.data(),
           id: doc.id,

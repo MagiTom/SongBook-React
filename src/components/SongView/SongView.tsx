@@ -34,7 +34,6 @@ export const SongView: React.FC<{
 
   useEffect(() => {
     const songItemEl = props.song;
-    console.log('ssoongformwiev', songItemEl)
     setSongItem(songItemEl);
     const pre = songItemEl?.text;
     let arr: string[] | undefined = pre?.split("\n");

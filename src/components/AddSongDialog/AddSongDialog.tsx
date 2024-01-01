@@ -214,8 +214,8 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Anuluj</Button>
-          {!editMode && <Button onClick={handleAddSong}>Dodaj</Button>}
-          {editMode && <Button onClick={handleEditSong}>Edytuj</Button>}
+          {!editMode && <Button onClick={handleAddSong}>Zapisz</Button>}
+          {editMode && <Button onClick={handleEditSong}>Zapisz</Button>}
         </DialogActions>
       </Dialog>
     </React.Fragment>
