@@ -37,6 +37,7 @@ import { useSongListContext } from "./context/SongListContext";
 import { useSongsDbContext } from "./context/firebaseContext";
 import { auth } from "./firebase-config";
 import { DBConfig } from "./lib/DBConfig";
+import { useMediaQuery } from "@mui/material";
 
 type ModeType = "light" | "dark";
 
@@ -130,12 +131,18 @@ export default function PersistentDrawerLeft() {
   const { error } = useErrorContext();
   const [currentMode, setCurrentMode] = React.useState<ModeType>("light"); // Track the current mode
   const navigate = useNavigate();
+  const matches = useMediaQuery('(max-width: 480px)');
 
   useEffect(() => {
     getCategoriesDb();
     const mode: ModeType = localStorage.getItem("currentMode") as ModeType;
+    if(matches){
+      setOpen1(false);
+      setOpen2(false);
+    }
     setCurrentMode(mode || "light");
-  }, [getCategoriesDb]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
@@ -161,7 +168,7 @@ export default function PersistentDrawerLeft() {
 
   const goToPage = (id: string) => {
     setSelectedIndex(id);
-    const url = `/song/${id}`;
+    const url = id ? `/song/${id}` : '/';
     return navigate(url);
   };
 
@@ -242,13 +249,13 @@ export default function PersistentDrawerLeft() {
             </IconButton>
             <Typography
               className="drawerTitle"
-              onClick={() => goToPage("/")}
+              onClick={() => goToPage("")}
               variant="h6"
               sx={{ flexGrow: 2 }}
               noWrap
               component="div"
             >
-              Śpiewnik Uwielbieniowy
+              Śpiewnik
               <MusicNoteIcon></MusicNoteIcon>
             </Typography>
             <Typography
@@ -311,7 +318,7 @@ export default function PersistentDrawerLeft() {
               <NavListItem
                 selected={selectedIndex === song.id}
                 removeSong={() => handleRemoveSong(song)}
-                goToPage={() => goToPage(`/song/${song.id}`)}
+                goToPage={() => goToPage(song.id)}
                 song={song}
                 key={song.id}
               ></NavListItem>

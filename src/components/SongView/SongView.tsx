@@ -12,7 +12,7 @@ export const SongView: React.FC<{
   inDb: boolean;
   id: string;
   isPrintMode?: boolean;
-}> = (props, inDb = false, isPrintMode = false) => {
+}> = (props) => {
   const [songArr, setSongArr] = useState<string[] | undefined>([]);
   const [songItem, setSongItem] = useState<SongPageItem>();
   const { update } = useIndexedDB("songs");
@@ -34,6 +34,7 @@ export const SongView: React.FC<{
 
   useEffect(() => {
     const songItemEl = props.song;
+    console.log('ssoongformwiev', songItemEl)
     setSongItem(songItemEl);
     const pre = songItemEl?.text;
     let arr: string[] | undefined = pre?.split("\n");

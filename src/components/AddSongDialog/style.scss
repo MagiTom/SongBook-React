@@ -22,3 +22,17 @@
         font-weight: bolder;
     }
 }
+
+@media (max-width: 480px) {
+    .category{
+        flex-direction: column;
+        gap: 0.2em;
+    }
+
+.inputText{
+    input, textarea {
+        font-size: 0.8rem;
+        line-height: 0.9rem;
+      }
+}
+  }

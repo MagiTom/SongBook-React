@@ -183,6 +183,7 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
             </div>
           </div>
           <TextField
+            className="inputText"
             fullWidth
             variant="standard"
             label="tytuł"
@@ -190,17 +191,18 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
             id="title"
             value={title}
             error={submitted && !title}
-            helperText={submitted && !title ? "Podaj Tytuł!" : ''}
+            helperText={submitted && !title ? "Podaj Tytuł!" : ""}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               setTitle(event.target.value);
             }}
           />
           <TextField
+            className="inputText"
             margin="dense"
             id="text"
             label="tekst"
             error={submitted && !text}
-            helperText={submitted && !text ? "Podaj tekst!" : ''}
+            helperText={submitted && !text ? "Podaj tekst!" : ""}
             value={text}
             multiline
             fullWidth

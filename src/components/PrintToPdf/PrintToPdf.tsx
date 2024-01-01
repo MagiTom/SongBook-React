@@ -7,6 +7,7 @@ import "./style.scss";
 
 const PrintToPdf: React.FC<{ songs: SongPageItem[] }> = ({ songs }) => {
   const componentRef = useRef(null);
+  console.log('songs', songs)
 
   const contentToPrint = songs.map((song) => (
     <SongView
@@ -21,6 +22,7 @@ const PrintToPdf: React.FC<{ songs: SongPageItem[] }> = ({ songs }) => {
   return (
     <div className="printBtn">
       <ReactToPrint
+      documentTitle="Śpiewnik"
         trigger={() => (
           <Button disabled={!songs?.length} variant="contained">
             Wydrukuj
@@ -29,7 +31,7 @@ const PrintToPdf: React.FC<{ songs: SongPageItem[] }> = ({ songs }) => {
         content={() => componentRef.current}
       />
       <div style={{ overflow: "hidden", height: "0" }}>
-        <div ref={componentRef}>{contentToPrint}</div>
+        <div style={{ color: 'black' }} ref={componentRef}>{contentToPrint}</div>
       </div>
     </div>
   );

@@ -10,3 +10,15 @@
         }
     }
 }
+
+@media (max-width: 480px) {
+    .song{
+        &__title{
+            flex-direction: column;
+            gap: 1em;
+            h3{
+                font-size: 0.9rem;
+            }
+        }
+    }
+  }

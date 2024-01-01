@@ -19,3 +19,9 @@
     bottom: 0;
     margin: 1em 2em;
 }
+
+@media (max-width: 480px) {
+    .drawerEmail{
+        display: none;
+    }
+  }
