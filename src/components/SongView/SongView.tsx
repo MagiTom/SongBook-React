@@ -35,7 +35,6 @@ export const SongView: React.FC<{
   useEffect(() => {
     const songItemEl = props.song;
     setSongItem(songItemEl);
-    console.log('song', songItemEl.text);
     const pre = songItemEl?.text;
     let arr: string[] | undefined = pre?.split("\n");
     for (let i = 0; i < arr.length - 1; i++) {
@@ -44,7 +43,6 @@ export const SongView: React.FC<{
         i++;
       }
     }
-    console.log('songArr', arr);
     setSongArr(arr);
   }, [props.song]);
   const changeSemiTones = (ev: number) => {
