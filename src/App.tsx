@@ -31,7 +31,7 @@ import LoginDialog from "./components/LoginDialog/LoginDialog";
 import { NavListItem } from "./components/NavListItem/NavListItem";
 import PrintToPdf from "./components/PrintToPdf/PrintToPdf";
 import Router from "./components/router";
-import { SongItem } from "./constans/songList";
+import { SongItem, SongPageItem } from "./constans/songList";
 import { useErrorContext } from "./context/ErrorContext";
 import { useSongListContext } from "./context/SongListContext";
 import { useSongsDbContext } from "./context/firebaseContext";
@@ -128,11 +128,13 @@ export default function PersistentDrawerLeft() {
   const [open2, setOpen2] = React.useState(true);
   const [user, setUser] = useState<User | null>();
   const { getCategoriesDb } = useSongsDbContext();
-  const { getSongList, getSongListAdmin, updateSongAdmin } = useSongListContext();
+  const { getSongList, getSongListAdmin, removeSongAdmin, addSongAdmin } = useSongListContext();
   const { error } = useErrorContext();
   const [currentMode, setCurrentMode] = React.useState<ModeType>("light"); // Track the current mode
   const navigate = useNavigate();
   const matches = useMediaQuery("(max-width: 480px)");
+
+  console.log('songItemList', songItemList)
 
   useEffect(() => {
     getCategoriesDb();
@@ -146,6 +148,7 @@ export default function PersistentDrawerLeft() {
   }, []);
 
   useEffect(() => {
+   
     onAuthStateChanged(auth, (user) => {
       setUser(user);
       if(!user){
@@ -153,7 +156,6 @@ export default function PersistentDrawerLeft() {
       } else {
         getSongListAdmin();
       }
-
     });
   }, [user]);
 
@@ -183,7 +185,7 @@ export default function PersistentDrawerLeft() {
     if(!user){
       addSong(song);
     } else {
-      updateSongAdmin(song, true)
+      addSongAdmin(song);
     }
   }
 
@@ -191,7 +193,7 @@ export default function PersistentDrawerLeft() {
     if(!user){
       removeSong(song);
     } else {
-      updateSongAdmin(song, false, true);
+      removeSongAdmin(song);
     }
   }
 
@@ -333,11 +335,11 @@ export default function PersistentDrawerLeft() {
           </DrawerHeader>
           <Divider />
           <List>
-            {songItemList?.map((song: SongItem) => (
+            {songItemList?.map((song: SongPageItem) => (
               <NavListItem
                 selected={selectedIndex === song.id}
                 removeSong={() => handleRemoveSong(song)}
-                goToPage={() => goToPage(song.id)}
+                goToPage={() => goToPage(!user ? song.id : (song?.songId || ''))}
                 song={song}
                 key={song.id}
               ></NavListItem>

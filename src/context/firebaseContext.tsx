@@ -25,7 +25,11 @@ export interface SongsDbModel {
   getSongDb: (id: string) => Promise<SongListItem | any>;
   deleteSongDb: (docId: string, textId: string) => Promise<void>;
   updateSongDb: (docId: string, song: SongPageItem) => Promise<void>;
-  getSongListDb: () => Promise<SongPageItem[]>;
+  getSongListDb: () => Promise<SongListItem[]>;
+  getChoosenDb: () => Promise<SongPageItem[]>;
+  addChoosenDb: (song: SongPageItem) => Promise<SongPageItem[] | any[]>;
+  deleteChoosenDb: (id: string) => Promise<void>;
+  updateChoosenDb: (docId: string, song: SongPageItem) => Promise<void>;
   getCategoriesDb: () => Promise<void>;
   addCategoryDb: (category: Category) => Promise<void>;
   deleteCategoryDb: (id: string) => Promise<void>;
@@ -42,6 +46,10 @@ const SongsDbContext = React.createContext<SongsDbModel>({
   addCategoryDb: () => Promise.resolve(),
   deleteCategoryDb: () => Promise.resolve(),
   getSongListDb: () => Promise.resolve([]),
+  getChoosenDb: () => Promise.resolve([]),
+  addChoosenDb: () => Promise.resolve([]),
+  deleteChoosenDb: () => Promise.resolve(),
+  updateChoosenDb: () => Promise.resolve(),
 });
 
 export const SongsDbProvider: React.FC<any> = ({ children }) => {
@@ -49,6 +57,7 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
   const [categoriesDb, setCategoriesDb] = useState<Category[]>([]);
   const collectionRef = collection(db, "songs");
   const collectionCategoryRef = collection(db, "categories");
+  const collectionChoosenRef = collection(db, "choosenSongs");
   const { addError } = useErrorContext();
 
   const getCategoriesDb = async (): Promise<void> => {
@@ -75,10 +84,67 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
       })
       .catch((err) => addError(err?.message));
   };
+
   const deleteCategoryDb = async (id: string) => {
     const documentRef = doc(db, "categories", id);
     await deleteDoc(documentRef).catch((err) => addError(err?.message));
     setCategoriesDb(categoriesDb.filter((item) => item.id !== id));
+  };
+
+  const getChoosenDb = async (): Promise<SongPageItem[] | any[]> => {
+    return getDocs(collectionChoosenRef)
+      .then((song) => {
+        let data: SongPageItem[] | any[] = song.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        }));
+        // setCategoriesDb(data);
+        return data;
+      })
+      .catch((err) => {
+        console.log(err);
+        addError(err?.message);
+        return err;
+      });
+  };
+
+  const addChoosenDb = async (
+    song: SongPageItem
+  ): Promise<SongPageItem[] | any[]> => {
+    return addDoc(collectionChoosenRef, {
+      ...song,
+    })
+      .then((song) => {
+        // setCategoriesDb(data);
+        return song.id;
+      })
+      .catch((err) => {
+        addError(err?.message);
+        return err;
+      });
+  };
+
+  const deleteChoosenDb = async (id: string) => {
+    const documentRef = doc(db, "choosenSongs", id);
+    return deleteDoc(documentRef)
+      .then((res) => console.log("resss", res))
+      .catch((err) => addError(err?.message));
+    // setCategoriesDb(categoriesDb.filter((item) => item.id !== id));
+  };
+
+  const updateChoosenDb = async (
+    docId: string,
+    song: SongPageItem
+  ): Promise<void> => {
+    try {
+      const songToAdd = {
+        ...song,
+      };
+      const documentRef = doc(db, "choosenSongs", docId);
+      updateDoc(documentRef, songToAdd);
+    } catch (err: any) {
+      addError(err?.message);
+    }
   };
 
   const getSongDb = async (id: string) => {
@@ -134,7 +200,7 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
         title: song.title,
         added: song?.added,
         text: song?.text,
-        semitones: song?.semitones
+        semitones: song?.semitones,
       };
       const documentRef = doc(db, "songs", docId);
       const questionRef = collection(db, `songs/${docId}/${docId}`);
@@ -147,10 +213,10 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
     }
   };
 
-  const getSongListDb = async (): Promise<SongPageItem[]> => {
+  const getSongListDb = async (): Promise<SongListItem[]> => {
     return getDocs(collectionRef)
       .then((todo) => {
-        let data: SongPageItem[] | any[] = todo.docs.map((doc) => ({
+        let data: SongListItem[] | any[] = todo.docs.map((doc) => ({
           ...doc.data(),
           id: doc.id,
         }));
@@ -168,6 +234,10 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
       value={{
         songListDb,
         categoriesDb,
+        getChoosenDb,
+        addChoosenDb,
+        deleteChoosenDb,
+        updateChoosenDb,
         deleteCategoryDb,
         addCategoryDb,
         getCategoriesDb,

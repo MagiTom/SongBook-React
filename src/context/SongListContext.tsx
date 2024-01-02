@@ -10,7 +10,15 @@ const SongListContext: React.Context<any> = createContext([]);
 export const SonglistProvider: React.FC<any> = ({ children }) => {
   const { getAll, add, deleteRecord } = useIndexedDB("songs");
   const { semitones } = useTransposeContext();
-  const { getSongListDb, getSongDb, updateSongDb } = useSongsDbContext();
+  const {
+    getSongListDb,
+    getSongDb,
+    updateSongDb,
+    getChoosenDb,
+    addChoosenDb,
+    deleteChoosenDb,
+    updateChoosenDb,
+  } = useSongsDbContext();
   const [songItemList, setSongList] = useState<SongPageItem[]>([]);
   const [allSongList, setAllSongList] = useState<SongItem[]>([]);
   const [selectedIndex, setSelectedIndex] = useState<string>();
@@ -33,53 +41,9 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
           }
           return el;
         });
-         // add to panel left
+        // add to panel left
         setAllSongList(updatedSongs);
       });
-    });
-  }
-
-  function updateSongAdmin(song: SongItem, added: boolean, deleteMode = false) {
-    getSongDb(song.id).then((item) => {
-      console.log(song);
-      const songToAdd: SongPageItem = {
-        ...song,
-        semitones,
-        text: item.text,
-        added,
-        id: item.id
-      };
-
-      updateSongDb(song.id, songToAdd).then(() =>{
-        const updateAllSong = allSongList.map((el) => {
-          if (el.id === song.id) {
-            return songToAdd;
-          }
-          return el;
-        });
-        setAllSongList([...updateAllSong]);
-        if(deleteMode){
-          const updatedSongs = songItemList.filter((item) => {
-            return song.id !== item.id;
-          });
-          setSongList(updatedSongs);
-        }  else {
-          setSongList([...songItemList, songToAdd]);
-        }
-      })
-
-      // add(songToAdd).then((res) => {
-      //   // add to panel right
-      //   setSongList([{ ...songToAdd, id: `${res}` }, ...songItemList]);
-      //   const updatedSongs = allSongList.map((el) => {
-      //     if (el.id === songToAdd.id) {
-      //       return { ...el, added: true };
-      //     }
-      //     return el;
-      //   });
-      //    // add to panel left
-      //   setAllSongList(updatedSongs);
-      // });
     });
   }
 
@@ -151,7 +115,7 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
   }
 
   const getSongList = () => {
-    getSongListDb().then((res: SongPageItem[] | any[]) => {
+    getSongListDb().then((res: SongListItem[] | any[]) => {
       getAll().then((songs: SongPageItem[]) => {
         const updatedChoosenList = res.map((song) => {
           const isAdded = songs.some((item: SongItem) => item.id === song.id);
@@ -169,15 +133,69 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
   };
 
   const getSongListAdmin = () => {
-    getSongListDb().then((res: SongPageItem[]) => {
-      // add to panle left
-      setAllSongList(res);
-      const panelLeftList = res.filter(item => item?.added)
-      // add to panel left
-      setSongList(panelLeftList);
+    getSongListDb().then((res: SongListItem[]) => {
+      getChoosenDb().then((songs: SongPageItem[]) => {
+        const updatedChoosenList = res.map((song) => {
+          const isAdded = songs.some((item: SongPageItem) => item.songId === song.id);
+          return {
+            ...song,
+            added: isAdded,
+          };
+        });
+        // add to panle left
+        setAllSongList(updatedChoosenList);
+        // add to panel left
+        setSongList(songs);
+      });
     });
   };
 
+  function addSongAdmin(song: SongItem) {
+    getSongDb(song.id).then((item) => {
+      console.log(song);
+      const songToAdd: SongPageItem = {
+        ...song,
+        semitones,
+        text: item.text,
+        songId: song.id
+      };
+      addChoosenDb(songToAdd).then((res) => {
+        // add to panel right
+        console.log('idddd Ad', res)
+        setSongList([{ ...songToAdd, id: `${res}`, songId: song.id }, ...songItemList]);
+        const updatedSongs = allSongList.map((el) => {
+          if (el.id === songToAdd.id) {
+            return { ...el, added: true };
+          }
+          return el;
+        });
+        // add to panel left
+        setAllSongList(updatedSongs);
+      });
+    });
+  }
+
+  function removeSongAdmin(song: SongPageItem) {
+    deleteChoosenDb(song.id).then((res) => {
+      console.log('idddd remove', song)
+      const updatedSongs = songItemList.filter((item) => {
+        return song.id !== item.id;
+      });
+      setSongList(updatedSongs);
+      const updatedAllList = allSongList.map((el) => {
+        if (el.id === song.songId) {
+          return { ...el, added: false };
+        }
+        return el;
+      });
+      setAllSongList(updatedAllList);
+    });
+  }
+  function updateSongAdmin(docId: string, song: SongPageItem) {
+    updateChoosenDb(docId, song).then(() =>{
+      editSongList(song, docId);
+    })
+  }
 
   return (
     <SongListContext.Provider
@@ -193,8 +211,10 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
         editSongList,
         setSelectedIndex,
         selectedIndex,
-        updateSongAdmin,
-        getSongListAdmin
+        getSongListAdmin,
+        addSongAdmin,
+        removeSongAdmin,
+        updateSongAdmin
       }}
     >
       {children}

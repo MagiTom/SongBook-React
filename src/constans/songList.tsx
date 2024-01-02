@@ -17,4 +17,5 @@ export interface SongItem extends SongListItem {
 
 export interface SongPageItem extends SongItem {
     text: string,
+    songId?: string
 }

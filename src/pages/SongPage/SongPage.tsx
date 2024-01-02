@@ -30,7 +30,7 @@ export const SongPage = () => {
 
   useEffect(() => {
     setSelectedIndex(id);
-    if (songListDb) {
+    if (!user && songListDb) {
       const findedSong = songListDb?.find((song) => song.id.toString() === id);
       if (findedSong) {
         getSongDb(findedSong.id).then((song) => {
@@ -44,6 +44,20 @@ export const SongPage = () => {
             }
           });
         });
+      }
+    } 
+    
+    if (user) {
+      const song = songItemList?.find((song: SongPageItem) => song?.songId === id);
+      if (song) {
+        setSong(song);
+        setSongDB(song);
+        setValue(+song?.semitones);
+      } else {
+        getSongDb(id || '').then((song) => {
+          setSong(song);
+        });
+        setValue(0);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

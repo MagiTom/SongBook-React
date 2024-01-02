@@ -3,12 +3,14 @@ import { useNavigate, useParams } from "react-router-dom";
 import SongTitle from "../../components/SongTitle/SongTitle";
 import { SongItem } from "../../constans/songList";
 import { useSongListContext } from "../../context/SongListContext";
+import { auth } from "../../firebase-config";
 
 export const CategoryPage = () => {
   const { category } = useParams();
   const [songListItems, setSongListItems] = useState<SongItem[]>([]);
-  const { addSong, allSongList } = useSongListContext();
+  const { addSong, allSongList, addSongAdmin } = useSongListContext();
   const navigate = useNavigate();
+  const user = auth.currentUser; 
 
   useEffect(() => {
     const findSongByCategory = allSongList.filter(
@@ -18,7 +20,12 @@ export const CategoryPage = () => {
   }, [category, allSongList]);
 
   const addSongItem = async (song: SongItem) => {
-    await addSong(song);
+    if(!user){
+      await addSong(song);
+    } else {
+      await addSongAdmin(song)
+    }
+  
   };
 
   const goPage = (id: string) => {

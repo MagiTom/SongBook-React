@@ -6,6 +6,9 @@ import { Chords } from "../Chords/Chords";
 import Lyrics from "../Lyrics/Lyrics";
 import { TransposeControl } from "../TranponseControl/TransposeControl";
 import "./style.scss";
+import { useSongsDbContext } from "../../context/firebaseContext";
+import { auth } from "../../firebase-config";
+import { useSongListContext } from "../../context/SongListContext";
 
 export const SongView: React.FC<{
   song: SongPageItem;
@@ -16,9 +19,12 @@ export const SongView: React.FC<{
   const [songArr, setSongArr] = useState<string[] | undefined>([]);
   const [songItem, setSongItem] = useState<SongPageItem>();
   const { update } = useIndexedDB("songs");
+  const { getCategoriesDb } = useSongsDbContext();
+  const { updateSongAdmin } = useSongListContext();
   const { semitones } = useTransposeContext();
   const [isOverflowing, setIsOverflowing] = useState(false);
   const textRef = useRef<any>(null);
+  const user = auth.currentUser; 
   useEffect(() => {
     const element = textRef.current;
     if (element.offsetHeight > window.innerHeight) {
@@ -37,7 +43,7 @@ export const SongView: React.FC<{
     setSongItem(songItemEl);
     const pre = songItemEl?.text;
     let arr: string[] | undefined = pre?.split("\n");
-    for (let i = 0; i < arr.length - 1; i++) {
+    for (let i = 0; i < arr?.length - 1; i++) {
       if (arr[i] === "" && arr[i + 1] !== "" && arr[i - 1] !== "") {
         arr.splice(i + 1, 0, "");
         i++;
@@ -46,15 +52,29 @@ export const SongView: React.FC<{
     setSongArr(arr);
   }, [props.song]);
   const changeSemiTones = (ev: number) => {
+    console.log('user====', user)
     if (props.inDb) {
       const songToUpdate = props.song;
-      const newUpdate = {
-        semitones: `${ev}`,
-        added: false,
-        ...songToUpdate,
-        id: props.id,
-      };
-      update(newUpdate);
+      if(!user){
+        const newUpdate = {
+          semitones: `${ev}`,
+          added: false,
+          ...songToUpdate,
+          id: props.id,
+        };
+        update(newUpdate);
+      } else {
+        const newUpdate = {
+          semitones: `${ev}`,
+          added: false,
+          title: songToUpdate.title,
+          category: songToUpdate.category,
+          text: songToUpdate.text,
+          songId: props.song.songId,
+        };
+        console.log('upadate', newUpdate)
+        updateSongAdmin(props.song.id, newUpdate)
+      }
     }
   };
   return (
