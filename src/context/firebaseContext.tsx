@@ -14,9 +14,15 @@ import {
   SongListItem,
   SongPageItem,
   SongToAdd,
+  SongToAddWithText,
 } from "../constans/songList";
 import { db } from "../firebase-config";
 import { useErrorContext } from "./ErrorContext";
+import firebase from "firebase/compat/app";
+
+export interface User {
+  email: string;
+}
 
 export interface SongsDbModel {
   songListDb: SongListItem[] | undefined;
@@ -33,6 +39,7 @@ export interface SongsDbModel {
   getCategoriesDb: () => Promise<void>;
   addCategoryDb: (category: Category) => Promise<void>;
   deleteCategoryDb: (id: string) => Promise<void>;
+  createUserDocument: (user: any) => Promise<void>;
 }
 
 const SongsDbContext = React.createContext<SongsDbModel>({
@@ -50,6 +57,7 @@ const SongsDbContext = React.createContext<SongsDbModel>({
   addChoosenDb: () => Promise.resolve([]),
   deleteChoosenDb: () => Promise.resolve(),
   updateChoosenDb: () => Promise.resolve(),
+  createUserDocument: () => Promise.resolve(),
 });
 
 export const SongsDbProvider: React.FC<any> = ({ children }) => {
@@ -59,37 +67,85 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
   const collectionCategoryRef = collection(db, "categories");
   const collectionChoosenRef = collection(db, "choosenSongs");
   const { addError } = useErrorContext();
+  const user = firebase.auth().currentUser;
+
+  const createUserDocument = async (user: any) => {
+    if (user) {
+      const userRef = db.collection("users").doc(user.uid);
+      const doc = await userRef.get();
+      if (!doc.exists) {
+        await userRef.set({
+          email: user.email,
+        });
+      }
+    }
+  };
 
   const getCategoriesDb = async (): Promise<void> => {
-    getDocs(collectionCategoryRef)
-      .then((todo) => {
-        let data: Category[] | any[] = todo.docs.map((doc) => ({
-          ...doc.data(),
-          id: doc.id,
-        }));
-        setCategoriesDb(data);
-      })
-      .catch((err) => {
-        console.log(err);
-        addError(err?.message);
-      });
+    const userAuth = firebase.auth().currentUser;
+    if (userAuth) {
+      const userRef = db.collection("users").doc(userAuth.uid);
+      try {
+        const doc = await userRef.get();
+
+        if (doc.exists) {
+          const userData = doc.data();
+          const categories = userData?.categories || [];
+
+          console.log("Lista kategorii dla użytkownika:", categories);
+          setCategoriesDb(categories);
+          return categories;
+        } else {
+          console.log("Dokument użytkownika nie istnieje.");
+          // return [];
+        }
+      } catch (error) {
+        console.error("Błąd podczas pobierania danych użytkownika:", error);
+        addError(error);
+        console.error("Błąd podczas pobierania danych użytkownika:", error);
+        // return [];
+      }
+    }
   };
 
   const addCategoryDb = async (category: Category) => {
-    await addDoc(collectionCategoryRef, {
-      ...category,
-    })
-      .then((res) => {
-        setCategoriesDb([{ ...category, id: res.id }, ...categoriesDb]);
-      })
-      .catch((err) => addError(err?.message));
+    if (user) {
+      const userRef = db.collection("users").doc(user.uid);
+      const doc = await userRef.get();
+      const newId = userRef.collection("categories").doc().id;
+      if (doc.exists) {
+        const userData = doc.data();
+        let categories = userData?.categories || [];
+        categories.push({ ...category, id: newId });
+        await userRef.update({
+          categories: categories,
+        });
+      }
+    }
   };
 
   const deleteCategoryDb = async (id: string) => {
-    const documentRef = doc(db, "categories", id);
-    await deleteDoc(documentRef).catch((err) => addError(err?.message));
-    setCategoriesDb(categoriesDb.filter((item) => item.id !== id));
+    try {
+      const userRef = firebase.firestore().collection("users").doc(user?.uid);
+      const userSnapshot = await userRef.get();
+      if (userSnapshot.exists && userSnapshot.data()?.categories) {
+        const categories = userSnapshot.data()?.categories;
+        const updatedCategories = categories.filter(
+          (category: Category) => category.id !== id
+        );
+        await userRef.update({ categories: updatedCategories });
+      } else {
+        addError(
+          "Nie znaleziono użytkownika lub użytkownik nie posiada pól categories."
+        );
+      }
+    } catch (error) {
+      console.error("Błąd podczas usuwania piosenki dla użytkownika:", error);
+      addError(error);
+    }
   };
+
+  // TO DO:
 
   const getChoosenDb = async (): Promise<SongPageItem[] | any[]> => {
     return getDocs(collectionChoosenRef)
@@ -108,6 +164,8 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
       });
   };
 
+  // TO DO
+
   const addChoosenDb = async (
     song: SongPageItem
   ): Promise<SongPageItem[] | any[]> => {
@@ -124,6 +182,8 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
       });
   };
 
+  // TO DO
+
   const deleteChoosenDb = async (id: string) => {
     const documentRef = doc(db, "choosenSongs", id);
     return deleteDoc(documentRef)
@@ -131,6 +191,8 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
       .catch((err) => addError(err?.message));
     // setCategoriesDb(categoriesDb.filter((item) => item.id !== id));
   };
+
+  //TO DO
 
   const updateChoosenDb = async (
     docId: string,
@@ -148,37 +210,66 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
   };
 
   const getSongDb = async (id: string) => {
-    const docRef = doc(db, "songs", id);
-    const docSnap = getDoc(docRef);
-    const songRef = collection(db, `songs/${docRef.id}/${docRef.id}`);
-    return getDocs(songRef)
-      .then(async (todo) => {
-        let data = todo.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
-        const songToDb: SongItem | any = {
-          ...(await docSnap).data(),
-          ...data[0],
-        };
-        return songToDb;
-      })
-      .catch((err) => addError(err?.message));
+    try {
+      const userRef = firebase.firestore().collection('users').doc(user?.uid).collection('songs').doc(id);
+      const userSnapshot = await userRef.get();
+
+      if (userSnapshot.exists) {
+        const text = userSnapshot.data();
+        console.log("Pełny tekst piosenki:", text);
+        return text
+      } else {
+        console.log("Nie znaleziono użytkownika.");
+      }
+    } catch (error) {
+      console.error("Błąd podczas pobierania tekstu piosenki:", error);
+      addError(error);
+    }
   };
 
   const addSongDb = async (song: SongToAdd) => {
-    const songToAdd = {
-      category: song.category,
-      title: song.title,
-    };
-    try {
-      return addDoc(collectionRef, songToAdd).then(async (res: any) => {
-        const questionRef = collection(db, `songs/${res.id}/${res.id}`);
-        await addDoc(questionRef, { text: song.text, title: song.title });
-        setSongListDb([...(songListDb || []), { ...songToAdd, id: res.id }]);
-        return res.id;
-      });
-    } catch (err: any) {
-      addError(err?.message);
+    if (user) {
+      try {
+        const userRef = firebase.firestore().collection("users").doc(user.uid);
+        const newId = userRef.collection("songs").doc().id
+        const songToAdd = {
+          category: song.category,
+          title: song.title,
+          id: newId,
+        };
+        await userRef.update({
+          songs: firebase.firestore.FieldValue.arrayUnion(songToAdd),
+        });
+        addSongTextToUser({...songToAdd, text: song.text})
+
+        console.log(
+          "Piosenka została dodana dla użytkownika z pełnym tekstem."
+        );
+      } catch (error) {
+        console.error(
+          "Błąd podczas dodawania piosenki dla użytkownika:",
+          error
+        );
+        addError(error);
+      }
     }
   };
+
+  const addSongTextToUser = async (song: SongToAddWithText) => {
+    try {
+      const userRef = firebase.firestore().collection('users').doc(user?.uid).collection('songs').doc(song.id);
+  
+      await userRef.set({
+        text: song.text,
+      });
+  
+      console.log('Pełny tekst piosenki został dodany dla użytkownika.');
+    } catch (error) {
+      console.error('Błąd podczas dodawania pełnego tekstu piosenki dla użytkownika:', error);
+    }
+  };
+  
+  // TO DO
 
   const deleteSongDb = async (docId: string, textId: string) => {
     try {
@@ -193,40 +284,72 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
     }
   };
 
+  // TO DO
+
   const updateSongDb = async (docId: string, song: SongPageItem) => {
+    // try {
+    //   const songToAdd = {
+    //     category: song.category,
+    //     title: song.title,
+    //     added: song?.added,
+    //     text: song?.text,
+    //     semitones: song?.semitones,
+    //   };
+    //   const documentRef = doc(db, "songs", docId);
+    //   const questionRef = collection(db, `songs/${docId}/${docId}`);
+    //   const documentRef2 = doc(questionRef, song.id);
+    //   await updateDoc(documentRef, songToAdd);
+    //   await updateDoc(documentRef2, { text: song.text, title: song.title });
+    //   setSongListDb([...(songListDb || []), { ...songToAdd, id: docId }]);
+    // } catch (err: any) {
+    //   addError(err?.message);
+    // }
     try {
       const songToAdd = {
         category: song.category,
         title: song.title,
         added: song?.added,
         text: song?.text,
-        semitones: song?.semitones,
+        // semitones: song?.semitones,
       };
-      const documentRef = doc(db, "songs", docId);
-      const questionRef = collection(db, `songs/${docId}/${docId}`);
-      const documentRef2 = doc(questionRef, song.id);
-      await updateDoc(documentRef, songToAdd);
-      await updateDoc(documentRef2, { text: song.text, title: song.title });
-      setSongListDb([...(songListDb || []), { ...songToAdd, id: docId }]);
-    } catch (err: any) {
-      addError(err?.message);
+      const fullSongsRef = firebase
+        .firestore()
+        .collection("fullSongs")
+        .doc(song.id);
+
+      // Zaktualizowanie całej piosenki (id, tytuł i tekst)
+      await fullSongsRef.set(songToAdd);
+
+      console.log("Piosenka została zaktualizowana z pełnym tekstem.");
+    } catch (error) {
+      console.error("Błąd podczas aktualizacji piosenki:", error);
     }
   };
 
   const getSongListDb = async (): Promise<SongListItem[]> => {
-    return getDocs(collectionRef)
-      .then((todo) => {
-        let data: SongListItem[] | any[] = todo.docs.map((doc) => ({
-          ...doc.data(),
-          id: doc.id,
-        }));
-        setSongListDb(data);
-        return data;
-      })
-      .catch((err: any) => {
-        addError(err?.message);
+    const userAuth = firebase.auth().currentUser;
+    try {
+      const userRef = firebase
+        .firestore()
+        .collection("users")
+        .doc(userAuth?.uid);
+      const userSnapshot = await userRef.get();
+
+      if (userSnapshot.exists) {
+        const songs = userSnapshot.data()?.songs;
+        console.log("Lista piosenek użytkownika:", songs);
+        setSongListDb(songs);
+        return songs;
+      } else {
+        console.log("Nie znaleziono użytkownika.");
+        addError("Nie znaleziono użytkownika.");
         return [];
-      });
+      }
+    } catch (error) {
+      console.error("Błąd podczas pobierania listy piosenek:", error);
+      addError(error);
+      return [];
+    }
   };
 
   return (
@@ -234,6 +357,7 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
       value={{
         songListDb,
         categoriesDb,
+        createUserDocument,
         getChoosenDb,
         addChoosenDb,
         deleteChoosenDb,

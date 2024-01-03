@@ -137,7 +137,6 @@ export default function PersistentDrawerLeft() {
   console.log('songItemList', songItemList)
 
   useEffect(() => {
-    getCategoriesDb();
     const mode: ModeType = localStorage.getItem("currentMode") as ModeType;
     if (matches) {
       setOpen1(false);
@@ -155,6 +154,7 @@ export default function PersistentDrawerLeft() {
         getSongList();
       } else {
         getSongListAdmin();
+        getCategoriesDb();
       }
     });
   }, [user]);

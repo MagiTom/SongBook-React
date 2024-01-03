@@ -40,7 +40,7 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
   const { categoriesDb, deleteCategoryDb, addCategoryDb } = useSongsDbContext();
 
   useEffect(() => {
-    if (prop.song?.id) {
+    if (prop.song) {
       setEditMode(true);
       setTitle(prop.song?.title);
       setText(prop.song.text);

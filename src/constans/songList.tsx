@@ -10,6 +10,10 @@ export interface SongListItem {
     category: string,
 }
 
+export interface SongToAddWithText extends SongListItem{
+    text: string,
+}
+
 export interface SongItem extends SongListItem {
     semitones?: number,
     added?: boolean,

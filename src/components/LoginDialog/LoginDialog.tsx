@@ -13,6 +13,7 @@ import { useErrorContext } from "../../context/ErrorContext";
 import { auth } from "../../firebase-config";
 import { VisibilityOff, Visibility } from "@mui/icons-material";
 import { InputAdornment, IconButton } from "@mui/material";
+import { useSongsDbContext } from "../../context/firebaseContext";
 
 const LoginDialog: React.FC<{ isLogin: boolean }> = (props) => {
   const [open, setOpen] = React.useState(false);
@@ -20,6 +21,7 @@ const LoginDialog: React.FC<{ isLogin: boolean }> = (props) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { addError } = useErrorContext();
+  const { createUserDocument } = useSongsDbContext();
   const [showPassword, setShowPassword] = React.useState(false);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
@@ -40,6 +42,7 @@ const LoginDialog: React.FC<{ isLogin: boolean }> = (props) => {
       .then((userCredential) => {
         const user = userCredential.user;
         handleClose();
+        createUserDocument(user);
         console.log(user);
       })
       .catch((error: any) => {
