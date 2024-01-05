@@ -35,7 +35,7 @@ export interface SongsDbModel {
   getChoosenDb: () => Promise<SongPageItem[]>;
   addChoosenDb: (song: SongPageItem) => Promise<SongPageItem[] | any[]>;
   deleteChoosenDb: (id: string) => Promise<void>;
-  updateChoosenDb: (docId: string, song: SongPageItem) => Promise<void>;
+  updateChoosenDb: (song: SongPageItem) => Promise<void>;
   getCategoriesDb: () => Promise<void>;
   addCategoryDb: (category: Category) => Promise<void>;
   deleteCategoryDb: (id: string) => Promise<void>;
@@ -208,7 +208,6 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
   };
 
   const updateChoosenDb = async (
-    docId: string,
     song: SongPageItem
   ): Promise<void> => {
     const userRef = firebase.firestore().collection("users").doc(user?.uid);
@@ -216,7 +215,7 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
     if (userSnapshot.exists) {
       const userSongs = userSnapshot.data()?.choosenSongs;
       const songIndex = userSongs.findIndex(
-        (song: SongListItem) => song.id === docId
+        (item: SongListItem) => song.id === item.id
       );
       if (songIndex !== -1) {
         userSongs[songIndex] = {

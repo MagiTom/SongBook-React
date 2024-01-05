@@ -150,12 +150,8 @@ export default function PersistentDrawerLeft() {
    
     onAuthStateChanged(auth, (user) => {
       setUser(user);
-      if(!user){
-        getSongList();
-      } else {
-        getSongListAdmin();
-        getCategoriesDb();
-      }
+      getSongListAdmin();
+      getCategoriesDb();
     });
   }, [user]);
 

@@ -30,24 +30,6 @@ export const SongPage = () => {
 
   useEffect(() => {
     setSelectedIndex(id);
-    if (!user && songListDb) {
-      const findedSong = songListDb?.find((song) => song.id.toString() === id);
-      if (findedSong) {
-        getSongDb(findedSong.id).then((song: SongPageItem) => {
-          setSong(song);
-          getByID(findedSong?.id).then((fromDb) => {
-            setSongDB(fromDb);
-            if (fromDb) {
-              setValue(+fromDb?.semitones);
-            } else {
-              setValue(0);
-            }
-          });
-        });
-      }
-    } 
-    
-    if (user) {
       const song = songItemList?.find((song: SongPageItem) => song?.songId === id);
       if (song) {
         setSong(song);
@@ -59,7 +41,6 @@ export const SongPage = () => {
         });
         setValue(0);
       }
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, songItemList]);
 

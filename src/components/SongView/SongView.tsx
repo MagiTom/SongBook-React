@@ -55,26 +55,16 @@ export const SongView: React.FC<{
     console.log('user====', user)
     if (props.inDb) {
       const songToUpdate = props.song;
-      if(!user){
-        const newUpdate = {
-          semitones: `${ev}`,
-          added: false,
-          ...songToUpdate,
-          id: props.id,
-        };
-        update(newUpdate);
-      } else {
-        const newUpdate = {
-          semitones: `${ev}`,
-          added: false,
-          title: songToUpdate.title,
-          category: songToUpdate.category,
-          text: songToUpdate.text,
-          songId: props.song.songId,
-        };
-        console.log('upadate', newUpdate)
-        updateSongAdmin(props.song.id, newUpdate)
-      }
+      const newUpdate = {
+        semitones: `${ev}`,
+        added: false,
+        title: songToUpdate.title,
+        category: songToUpdate.category,
+        text: songToUpdate.text,
+        songId: props.song.songId,
+      };
+      console.log('upadate', newUpdate)
+      updateSongAdmin(props.song.id, newUpdate)
     }
   };
   return (

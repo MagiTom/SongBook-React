@@ -24,29 +24,6 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
   const [selectedIndex, setSelectedIndex] = useState<string>();
   const user = auth.currentUser;
 
-  function addSong(song: SongItem) {
-    getSongDb(song.id).then((item) => {
-      console.log(song);
-      const songToAdd: SongPageItem = {
-        ...song,
-        semitones,
-        text: item.text,
-      };
-      add(songToAdd).then((res) => {
-        // add to panel right
-        setSongList([{ ...songToAdd, id: `${res}` }, ...songItemList]);
-        const updatedSongs = allSongList.map((el) => {
-          if (el.id === songToAdd.id) {
-            return { ...el, added: true };
-          }
-          return el;
-        });
-        // add to panel left
-        setAllSongList(updatedSongs);
-      });
-    });
-  }
-
   function updateSongList(song: SongItem) {
     console.log(song);
     const songToAdd: SongItem = {
@@ -58,23 +35,23 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
     setAllSongList([...allSongList, songToAdd]);
   }
 
-  function editSongList(song: SongPageItem, id: string) {
+  function editSongList(song: SongPageItem) {
     const songToAdd: SongItem = {
       category: song.category,
       title: song.title,
-      added: !!songItemList.find((x: SongItem) => x.id === id) || false,
-      id,
+      added: !!songItemList.find((x: SongItem) => x.id === song.id) || false,
+      id: song.id,
     };
 
     const updateAllSong = allSongList.map((el) => {
-      if (el.id === id) {
+      if (el.id === song.id) {
         return songToAdd;
       }
       return el;
     });
     const updateSongs = songItemList.map((el) => {
-      if (el.id === id) {
-        return { ...song, id };
+      if (el.id === song.id) {
+        return { ...song, id: song.id };
       }
       return el;
     });
@@ -83,54 +60,12 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
     setSongList([...updateSongs]);
   }
 
-  function removeSong(song: SongItem) {
-    deleteRecord(song.id).then(() => {
-      const updatedSongs = songItemList.filter((item) => {
-        return song.id !== item.id;
-      });
-      setSongList(updatedSongs);
-      const updatedAllList = allSongList.map((el) => {
-        if (el.id === song.id) {
-          return { ...el, added: false };
-        }
-        return el;
-      });
-      setAllSongList(updatedAllList);
-    });
-  }
-
-  function deleteFromAllList(id: string) {
-    deleteRecord(id).then(() => {
-      const updatedSongs = songItemList.filter((item) => {
-        return id !== item.id;
-      });
-      setSongList(updatedSongs);
-      deleteSongFromList(id);
-    });
-  }
 
   function deleteSongFromList(id: string) {
     const updatedAllList = allSongList.filter((el) => el.id !== id);
     setAllSongList(updatedAllList);
   }
 
-  const getSongList = () => {
-    getSongListDb().then((res: SongListItem[] | any[]) => {
-      getAll().then((songs: SongPageItem[]) => {
-        const updatedChoosenList = res.map((song) => {
-          const isAdded = songs.some((item: SongItem) => item.id === song.id);
-          return {
-            ...song,
-            added: isAdded,
-          };
-        });
-        // add to panle left
-        setAllSongList(updatedChoosenList);
-        // add to panel left
-        setSongList(songs);
-      });
-    });
-  };
 
   const getSongListAdmin = () => {
     getSongListDb().then((res: SongListItem[]) => {
@@ -191,23 +126,19 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
       setAllSongList(updatedAllList);
     });
   }
-  function updateSongAdmin(docId: string, song: SongPageItem) {
-    updateChoosenDb(docId, song).then(() =>{
-      editSongList(song, docId);
+  function updateSongAdmin(song: SongPageItem) {
+    updateChoosenDb(song).then(() =>{
+      editSongList(song);
     })
   }
 
   return (
     <SongListContext.Provider
       value={{
-        addSong,
-        removeSong,
-        getSongList,
         songItemList,
         allSongList,
         deleteSongFromList,
         updateSongList,
-        deleteFromAllList,
         editSongList,
         setSelectedIndex,
         selectedIndex,
