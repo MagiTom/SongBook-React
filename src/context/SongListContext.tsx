@@ -135,17 +135,17 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
   const getSongListAdmin = () => {
     getSongListDb().then((res: SongListItem[]) => {
       getChoosenDb().then((songs: SongPageItem[]) => {
-        const updatedChoosenList = res.map((song) => {
-          const isAdded = songs.some((item: SongPageItem) => item.songId === song.id);
+        const updatedChoosenList = res?.map((song) => {
+          const isAdded = songs?.some((item: SongPageItem) => item.songId === song.id);
           return {
             ...song,
             added: isAdded,
           };
         });
         // add to panle left
-        setAllSongList(updatedChoosenList);
+        setAllSongList(updatedChoosenList || []);
         // add to panel left
-        setSongList(songs);
+        setSongList(songs || []);
       });
     });
   };
@@ -157,12 +157,12 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
         ...song,
         semitones,
         text: item.text,
-        songId: song.id
+        // songId: song.id
       };
       addChoosenDb(songToAdd).then((res) => {
         // add to panel right
         console.log('idddd Ad', res)
-        setSongList([{ ...songToAdd, id: `${res}`, songId: song.id }, ...songItemList]);
+        setSongList([{ ...songToAdd }, ...songItemList]);
         const updatedSongs = allSongList.map((el) => {
           if (el.id === songToAdd.id) {
             return { ...el, added: true };

@@ -8,9 +8,9 @@ import { SongView } from "../../components/SongView/SongView";
 import { SongItem, SongPageItem } from "../../constans/songList";
 import { useSongListContext } from "../../context/SongListContext";
 import { useTransposeContext } from "../../context/TransposeContext";
-import { useSongsDbContext } from "../../context/firebaseContext";
 import { auth } from "../../firebase-config";
 import "./style.scss";
+import { useSongsDbContext } from "../../context/firebaseContext";
 
 export const SongPage = () => {
   const { id } = useParams();
@@ -33,7 +33,7 @@ export const SongPage = () => {
     if (!user && songListDb) {
       const findedSong = songListDb?.find((song) => song.id.toString() === id);
       if (findedSong) {
-        getSongDb(findedSong.id).then((song) => {
+        getSongDb(findedSong.id).then((song: SongPageItem) => {
           setSong(song);
           getByID(findedSong?.id).then((fromDb) => {
             setSongDB(fromDb);
@@ -54,7 +54,7 @@ export const SongPage = () => {
         setSongDB(song);
         setValue(+song?.semitones);
       } else {
-        getSongDb(id || '').then((song) => {
+        getSongDb(id || '').then((song: SongPageItem) => {
           setSong(song);
         });
         setValue(0);
