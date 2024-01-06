@@ -19,17 +19,18 @@ import {
 import { db } from "../firebase-config";
 import { useErrorContext } from "./ErrorContext";
 import firebase from "firebase/compat/app";
+import { FullSong, SongListLeft } from "../models/SongListLeft.model";
 
 export interface User {
   email: string;
 }
 
 export interface SongsDbModel {
-  songListDb: SongListItem[] | undefined;
+  songListDb: SongListLeft[] | undefined;
   categoriesDb: Category[];
   addSongDb: (song: SongToAdd) => Promise<void>;
-  getSongDb: (id: string) => Promise<SongListItem | any>;
-  deleteSongDb: (docId: string, textId: string) => Promise<void>;
+  getSongDb: (id: string) => Promise<SongListLeft | any>;
+  deleteSongDb: (song: FullSong) => Promise<void>;
   updateSongDb: (docId: string, song: SongPageItem) => Promise<void>;
   getSongListDb: () => Promise<SongListItem[]>;
   getChoosenDb: () => Promise<SongPageItem[]>;
@@ -108,20 +109,30 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
     }
   };
 
-  const addCategoryDb = async (category: Category) => {
-    if (user) {
-      const userRef = db.collection("users").doc(user.uid);
-      const doc = await userRef.get();
-      const newId = userRef.collection("categories").doc().id;
-      if (doc.exists) {
-        const userData = doc.data();
-        let categories = userData?.categories || [];
-        categories.push({ ...category, id: newId });
-        await userRef.update({
-          categories: categories,
-        });
-      }
+  const addElementToDb = async (element: any, collection: string) =>{
+    try {
+      const userRef = firebase.firestore().collection("users").doc(user?.uid);
+      const newId = element?.id || userRef.collection(collection).doc().id;
+      const updateEl = {...element, newId};
+      await userRef.update({
+        [collection]: firebase.firestore.FieldValue.arrayUnion(updateEl),
+      });
+      console.log(
+        "Piosenka została dodana dla użytkownika z pełnym tekstem."
+      );
+
+      return updateEl;
+    } catch (error) {
+      console.error(
+        "Błąd podczas dodawania piosenki dla użytkownika:",
+        error
+      );
+      addError(error);
     }
+  }
+
+  const addCategoryDb = async (category: Category) => {
+      addElementToDb(category, "categories");
   };
 
   const deleteCategoryDb = async (id: string) => {
@@ -304,22 +315,30 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
     }
   };
 
-  const deleteSongDb = async (docId: string, textId: string) => {
+  const deleteSongDb = async (song: FullSong) => {
+    console.log('songToDelete', song)
     if (user) {
       try {
-        const userRef = firebase.firestore().collection("users").doc(user.uid);
-        await userRef.update({
-          songs: firebase.firestore.FieldValue.arrayRemove(docId),
-        });
-        console.log("Piosenka została pomyślnie usunięta.");
-        deleteSongTextFromUser(textId);
+      const songToDelete = {
+        id: song.id,
+        category: song.category,
+        title: song.title
+      }
+      console.log('songToDelete', songToDelete)
+      const userRef = firebase.firestore().collection("users").doc(user.uid);
+      await userRef.update({
+        songs: firebase.firestore.FieldValue.arrayRemove(songToDelete),
+      });
+      console.log("Piosenka została pomyślnie usunięta.");
+      // Przyjmując, że deleteSongTextFromUser jest zdefiniowane gdzieś indziej
+      deleteSongTextFromUser(song.id);
       } catch (error) {
         console.error("Błąd podczas usuwania piosenki:", error);
         addError(error);
       }
-    }
-  };
-  const deleteSongTextFromUser = async (textId: string) => {
+  }
+}
+  const deleteSongTextFromUser = async (docId: string) => {
     if (user) {
       try {
         const userSongRef = firebase
@@ -327,7 +346,7 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
           .collection("users")
           .doc(user.uid)
           .collection("songs")
-          .doc(textId);
+          .doc(docId);
   
         await userSongRef.delete();
   
@@ -379,7 +398,6 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
 
   const updateSongTextForUser = async (id: string, songToAdd: SongToAdd) => {
     try {
-      debugger
       const userRef = firebase
         .firestore()
         .collection("users")

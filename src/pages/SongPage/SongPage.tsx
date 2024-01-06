@@ -11,18 +11,20 @@ import { useTransposeContext } from "../../context/TransposeContext";
 import { auth } from "../../firebase-config";
 import "./style.scss";
 import { useSongsDbContext } from "../../context/firebaseContext";
+import { FullSong } from "../../models/SongListLeft.model";
 
 export const SongPage = () => {
   const { id } = useParams();
   const { songListDb, getSongDb, deleteSongDb } = useSongsDbContext();
   const [songDB, setSongDB] = useState<SongItem>();
-  const [song, setSong] = useState<SongPageItem>();
+  const [song, setSong] = useState<FullSong>();
   const { getByID } = useIndexedDB("songs");
   const {
     deleteSongFromList,
     songItemList,
     deleteFromAllList,
     setSelectedIndex,
+    allSongList
   } = useSongListContext();
   const { setValue } = useTransposeContext();
   const navigate = useNavigate();
@@ -30,14 +32,20 @@ export const SongPage = () => {
 
   useEffect(() => {
     setSelectedIndex(id);
-      const song = songItemList?.find((song: SongPageItem) => song?.songId === id);
+    console.log('song', id)
+      const song = songItemList?.find((song: SongPageItem) => song?.id === id);
       if (song) {
         setSong(song);
         setSongDB(song);
         setValue(+song?.semitones);
       } else {
-        getSongDb(id || '').then((song: SongPageItem) => {
-          setSong(song);
+        getSongDb(id || '').then((songEl: FullSong) => {
+          console.log('song', songEl)
+          let songToShow = songEl;
+          if(!songEl) {
+            songToShow = allSongList?.find((song: SongPageItem) => song?.id === id);
+          }
+          setSong(songToShow);
         });
         setValue(0);
       }
@@ -45,7 +53,9 @@ export const SongPage = () => {
   }, [id, songItemList]);
 
   const handleRemove = async () => {
-    if (id && song) await deleteSongDb(id, song?.id);
+    console.log('song', song)
+    if(id && song)
+   await deleteSongDb({...song, id});
     if (songDB) {
       deleteFromAllList(songDB.id);
     } else {
