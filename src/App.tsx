@@ -38,6 +38,8 @@ import { useSongsDbContext } from "./context/firebaseContext";
 import { auth } from "./firebase-config";
 import { DBConfig } from "./lib/DBConfig";
 import { ListItem, useMediaQuery } from "@mui/material";
+import { SongListLeft } from "./models/SongListLeft.model";
+import { SongListRight } from "./models/SongListRight.model";
 
 type ModeType = "light" | "dark";
 
@@ -128,13 +130,19 @@ export default function PersistentDrawerLeft() {
   const [open2, setOpen2] = React.useState(true);
   const [user, setUser] = useState<User | null>();
   const { getCategoriesDb } = useSongsDbContext();
-  const { getSongList, getSongListAdmin, removeSongAdmin, addSongAdmin } = useSongListContext();
+  const {
+    updateSongLists,
+    getSongListAdmin,
+    addSongRight,
+    removeSongRight,
+    updateSongAdmin,
+  } = useSongListContext();
   const { error } = useErrorContext();
   const [currentMode, setCurrentMode] = React.useState<ModeType>("light"); // Track the current mode
   const navigate = useNavigate();
   const matches = useMediaQuery("(max-width: 480px)");
 
-  console.log('songItemList', songItemList)
+  console.log("songItemList", songItemList);
 
   useEffect(() => {
     const mode: ModeType = localStorage.getItem("currentMode") as ModeType;
@@ -147,7 +155,6 @@ export default function PersistentDrawerLeft() {
   }, []);
 
   useEffect(() => {
-   
     onAuthStateChanged(auth, (user) => {
       setUser(user);
       getSongListAdmin();
@@ -177,20 +184,12 @@ export default function PersistentDrawerLeft() {
     return navigate(url);
   };
 
-  function handleAddSong(song: SongItem) {
-    if(!user){
-      addSong(song);
-    } else {
-      addSongAdmin(song);
-    }
+  function handleAddSong(song: SongListLeft) {
+    addSongRight(song);
   }
 
-  function handleRemoveSong(song: SongItem) {
-    if(!user){
-      removeSong(song);
-    } else {
-      removeSongAdmin(song);
-    }
+  function handleRemoveSong(song: SongListRight) {
+    removeSongRight(song)
   }
 
   const toggleMode = () => {
@@ -238,12 +237,17 @@ export default function PersistentDrawerLeft() {
                 key={song.id}
               ></NavListItem>
             ))}
-
           </List>
           <Divider />
-    
-          <List style={{ bottom: 0, position: 'fixed', background: currentMode === 'dark' ? '#121212' : 'white' }}>
-          <ListItem>
+
+          <List
+            style={{
+              bottom: 0,
+              position: "fixed",
+              background: currentMode === "dark" ? "#121212" : "white",
+            }}
+          >
+            <ListItem>
               <div className="footer">
                 {user && <AddSongDialog></AddSongDialog>}
                 <LoginDialog isLogin={!!user?.uid}></LoginDialog>
@@ -331,11 +335,11 @@ export default function PersistentDrawerLeft() {
           </DrawerHeader>
           <Divider />
           <List>
-            {songItemList?.map((song: SongPageItem) => (
+            {songItemList?.map((song: SongListRight) => (
               <NavListItem
                 selected={selectedIndex === song.id}
                 removeSong={() => handleRemoveSong(song)}
-                goToPage={() => goToPage(!user ? song.id : (song?.songId || ''))}
+                goToPage={() => goToPage(!user ? song.id : song?.id || "")}
                 song={song}
                 key={song.id}
               ></NavListItem>

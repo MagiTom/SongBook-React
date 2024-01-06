@@ -21,10 +21,10 @@ import { useSongListContext } from "../../context/SongListContext";
 import { useSongsDbContext } from "../../context/firebaseContext";
 import AlertDialog from "../AlertDialog/AlertDialog";
 import "./style.scss";
+import { FullSong, SongToUpdate } from "../../models/SongListLeft.model";
 
 export type SongProps = {
-  song?: SongPageItem;
-  id?: string;
+  song?: FullSong;
 };
 
 const AddSongDialog: React.FC<SongProps> = (prop) => {
@@ -36,7 +36,15 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
   const [category, setCategory] = React.useState<string>("");
   const [newCategory, setNewCategory] = React.useState<string>("");
   const [editMode, setEditMode] = React.useState<boolean>(false);
-  const { updateSongList, editSongList } = useSongListContext();
+  const {
+    updateSongLists,
+    getSongListAdmin,
+    addSongRight,
+    removeSongRight,
+    addSongListLeft,
+    updateSongAdmin,
+    editSong
+  } = useSongListContext();
   const { categoriesDb, deleteCategoryDb, addCategoryDb } = useSongsDbContext();
 
   useEffect(() => {
@@ -64,22 +72,14 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
         category,
         text,
       };
-      const id = await addSongDb(songToAdd);
-      updateSongList({ ...songToAdd, id: id });
+      addSongListLeft(songToAdd);
       clearData();
       handleClose();
     }
   };
 
   const handleEditSong = async () => {
-    const songToAdd: SongPageItem = {
-      title,
-      category,
-      text,
-      id: prop.song?.id || "",
-    };
-    await updateSongDb(prop?.id || "", songToAdd);
-    editSongList(songToAdd, prop.id);
+    editSong(prop.song);
     clearData();
     handleClose();
   };
@@ -98,7 +98,7 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
     setNewCategory("");
   };
   const deleteCategory = async (categoryItem: Category) => {
-    await deleteCategoryDb(categoryItem?.id || "");
+    await deleteCategoryDb(categoryItem);
     console.log(category);
     if (categoryItem.name === category) {
       setCategory("");

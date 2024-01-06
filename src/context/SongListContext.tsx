@@ -1,9 +1,11 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useIndexedDB } from "react-indexed-db-hook";
-import { SongItem, SongListItem, SongPageItem } from "../constans/songList";
+import { SongItem, SongListItem, SongPageItem, SongToAdd } from "../constans/songList";
 import { useTransposeContext } from "./TransposeContext";
 import { useSongsDbContext } from "./firebaseContext";
 import { auth } from "../firebase-config";
+import { SongListRight } from "../models/SongListRight.model";
+import { FullSong, SongListLeft, SongToUpdate } from "../models/SongListLeft.model";
 
 const SongListContext: React.Context<any> = createContext([]);
 
@@ -14,138 +16,139 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
     getSongListDb,
     getSongDb,
     updateSongDb,
+    addSongDb,
     getChoosenDb,
     addChoosenDb,
     deleteChoosenDb,
     updateChoosenDb,
   } = useSongsDbContext();
-  const [songItemList, setSongList] = useState<SongPageItem[]>([]);
-  const [allSongList, setAllSongList] = useState<SongItem[]>([]);
+  const [songListRight, setSongListRight] = useState<SongListRight[]>([]);
+  const [songListLeft, setSongListLeft] = useState<SongListLeft[]>([]);
   const [selectedIndex, setSelectedIndex] = useState<string>();
   const user = auth.currentUser;
 
-  function updateSongList(song: SongItem) {
+  async function addSongListLeft(song: SongToAdd) {
+   const id = await addSongDb(song);
     console.log(song);
-    const songToAdd: SongItem = {
+    const songToAdd: SongListLeft = {
       category: song.category,
       title: song.title,
-      added: false,
-      id: song.id,
+      added: !!songListRight.find((x: SongListRight) => x.id === id) || false,
+      id,
     };
-    setAllSongList([...allSongList, songToAdd]);
+    setSongListLeft([...songListLeft, songToAdd]);
   }
 
-  function editSongList(song: SongPageItem) {
-    const songToAdd: SongItem = {
+  function updateSongLists(song: SongListRight) {
+    const songToAdd: SongListLeft = {
       category: song.category,
       title: song.title,
-      added: !!songItemList.find((x: SongItem) => x.id === song.id) || false,
       id: song.id,
+      added: !!songListRight.find((x: SongItem) => x.id === song.id) || false
     };
 
-    const updateAllSong = allSongList.map((el) => {
+    const updateLeft = songListLeft.map((el) => {
       if (el.id === song.id) {
         return songToAdd;
       }
       return el;
     });
-    const updateSongs = songItemList.map((el) => {
+    const updateRight = songListRight.map((el) => {
       if (el.id === song.id) {
-        return { ...song, id: song.id };
+        return { ...song };
       }
       return el;
     });
 
-    setAllSongList([...updateAllSong]);
-    setSongList([...updateSongs]);
+    setSongListLeft([...updateLeft]);
+    setSongListRight([...updateRight]);
   }
 
 
-  function deleteSongFromList(id: string) {
-    const updatedAllList = allSongList.filter((el) => el.id !== id);
-    setAllSongList(updatedAllList);
+  function deleteSongFromLeft(id: string) {
+    const updatedAllList = songListLeft.filter((el) => el.id !== id);
+    setSongListLeft(updatedAllList);
   }
 
 
   const getSongListAdmin = () => {
     getSongListDb().then((res: SongListItem[]) => {
-      getChoosenDb().then((songs: SongPageItem[]) => {
+      getChoosenDb().then((songs: SongListRight[]) => {
         const updatedChoosenList = res?.map((song) => {
-          const isAdded = songs?.some((item: SongPageItem) => item.songId === song.id);
+          const isAdded = songs?.some((item: SongListRight) => item.id === song.id);
           return {
             ...song,
             added: isAdded,
           };
         });
-        // add to panle left
-        setAllSongList(updatedChoosenList || []);
-        // add to panel left
-        setSongList(songs || []);
+        setSongListLeft(updatedChoosenList || []);
+        setSongListRight(songs);
       });
     });
   };
 
-  function addSongAdmin(song: SongItem) {
+  function addSongRight(song: SongToUpdate) {
     getSongDb(song.id).then((item) => {
       console.log(song);
-      const songToAdd: SongPageItem = {
+      const songToAdd: SongListRight = {
         ...song,
         semitones,
         text: item.text,
         // songId: song.id
       };
       addChoosenDb(songToAdd).then((res) => {
-        // add to panel right
-        console.log('idddd Ad', res)
-        setSongList([{ ...songToAdd }, ...songItemList]);
-        const updatedSongs = allSongList.map((el) => {
-          if (el.id === songToAdd.id) {
-            return { ...el, added: true };
-          }
-          return el;
-        });
-        // add to panel left
-        setAllSongList(updatedSongs);
+        // setSongListRight([{ ...songToAdd }, ...songListRight]);
+        // const updatedSongs = songListLeft.map((el) => {
+        //   if (el.id === songToAdd.id) {
+        //     return { ...el, added: true };
+        //   }
+        //   return el;
+        // });
+        // // add to panel left
+        // setSongListLeft(updatedSongs);
+        updateSongLists(songToAdd)
       });
     });
   }
 
-  function removeSongAdmin(song: SongPageItem) {
-    deleteChoosenDb(song.id).then((res) => {
+  function removeSongRight(song: SongListRight) {
+    deleteChoosenDb(song).then((res) => {
       console.log('idddd remove', song)
-      const updatedSongs = songItemList.filter((item) => {
+      const updatedSongs = songListRight.filter((item) => {
         return song.id !== item.id;
       });
-      setSongList(updatedSongs);
-      const updatedAllList = allSongList.map((el) => {
-        if (el.id === song.songId) {
+      setSongListRight(updatedSongs);
+      const updatedAllList = songListLeft.map((el) => {
+        if (el.id === song.id) {
           return { ...el, added: false };
         }
         return el;
       });
-      setAllSongList(updatedAllList);
+      setSongListLeft(updatedAllList);
     });
   }
-  function updateSongAdmin(song: SongPageItem) {
+  function updateSongsRight(song: SongListRight) {
     updateChoosenDb(song).then(() =>{
-      editSongList(song);
+      updateSongLists(song);
+    })
+  }
+  function editSong(song: SongListRight) {
+    console.log('songToedit', song);
+    updateSongDb(song).then(() =>{
+      updateSongLists(song);
     })
   }
 
   return (
     <SongListContext.Provider
       value={{
-        songItemList,
-        allSongList,
-        deleteSongFromList,
-        updateSongList,
-        editSongList,
-        setSelectedIndex,
-        selectedIndex,
+        updateSongLists,
         getSongListAdmin,
-        addSongAdmin,
-        removeSongAdmin,
-        updateSongAdmin
+        addSongRight,
+        removeSongRight,
+        editSong,
+        updateSongsRight,
+        addSongListLeft
       }}
     >
       {children}

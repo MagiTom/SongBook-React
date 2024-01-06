@@ -77,7 +77,7 @@ export const SongPage = () => {
               </Button>
             }
           ></AlertDialog>
-          <AddSongDialog song={song} id={id}></AddSongDialog>
+          <AddSongDialog song={song}></AddSongDialog>
         </div>
       )}
     </div>
