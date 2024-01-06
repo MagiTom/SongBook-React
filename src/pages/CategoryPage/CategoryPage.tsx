@@ -8,24 +8,27 @@ import { auth } from "../../firebase-config";
 export const CategoryPage = () => {
   const { category } = useParams();
   const [songListItems, setSongListItems] = useState<SongItem[]>([]);
-  const { addSong, allSongList, addSongAdmin } = useSongListContext();
+  const {      updateSongLists,
+    getSongListAdmin,
+    addSongRight,
+    removeSongRight,
+    editSong,
+    updateSongsRight,
+    addSongListLeft,
+    songListLeft,
+    songListRight } = useSongListContext();
   const navigate = useNavigate();
   const user = auth.currentUser; 
 
   useEffect(() => {
-    const findSongByCategory = allSongList.filter(
+    const findSongByCategory = songListLeft.filter(
       (song: SongItem) => song.category === category
     );
-    setSongListItems(category ? findSongByCategory : allSongList);
-  }, [category, allSongList]);
+    setSongListItems(category ? findSongByCategory : songListLeft);
+  }, [category, songListLeft]);
 
   const addSongItem = async (song: SongItem) => {
-    if(!user){
-      await addSong(song);
-    } else {
-      await addSongAdmin(song)
-    }
-  
+    addSongRight(song);
   };
 
   const goPage = (id: string) => {

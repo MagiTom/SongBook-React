@@ -64,10 +64,34 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
     setSongListRight([...updateRight]);
   }
 
+  const updateLeft = (songToAdd: SongListLeft) =>{
+    const updateLeft = songListLeft.map((el) => {
+      if (el.id === songToAdd.id) {
+        return songToAdd;
+      }
+      return el;
+    });
+    setSongListLeft([...updateLeft]);
+  }
+
+  const updateRight = (song: SongListRight) =>{
+    const updateRight = songListRight.map((el) => {
+      if (el.id === song.id) {
+        return { ...song };
+      }
+      return el;
+    });
+    setSongListRight([...updateRight]);
+  }
+
 
   function deleteSongFromLeft(id: string) {
     const updatedAllList = songListLeft.filter((el) => el.id !== id);
     setSongListLeft(updatedAllList);
+  }
+
+  const removeSong = () => {
+
   }
 
 
@@ -97,15 +121,6 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
         // songId: song.id
       };
       addChoosenDb(songToAdd).then((res) => {
-        // setSongListRight([{ ...songToAdd }, ...songListRight]);
-        // const updatedSongs = songListLeft.map((el) => {
-        //   if (el.id === songToAdd.id) {
-        //     return { ...el, added: true };
-        //   }
-        //   return el;
-        // });
-        // // add to panel left
-        // setSongListLeft(updatedSongs);
         updateSongLists(songToAdd)
       });
     });
@@ -148,7 +163,9 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
         removeSongRight,
         editSong,
         updateSongsRight,
-        addSongListLeft
+        addSongListLeft,
+        songListLeft,
+        songListRight
       }}
     >
       {children}

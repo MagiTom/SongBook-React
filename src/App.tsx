@@ -135,7 +135,11 @@ export default function PersistentDrawerLeft() {
     getSongListAdmin,
     addSongRight,
     removeSongRight,
-    updateSongAdmin,
+    editSong,
+    updateSongsRight,
+    addSongListLeft,
+    songListLeft,
+    songListRight
   } = useSongListContext();
   const { error } = useErrorContext();
   const [currentMode, setCurrentMode] = React.useState<ModeType>("light"); // Track the current mode
@@ -228,7 +232,7 @@ export default function PersistentDrawerLeft() {
           </DrawerHeader>
           <Divider />
           <List>
-            {allSongList.map((song: SongItem) => (
+            {songListLeft.map((song: SongItem) => (
               <NavListItem
                 selected={selectedIndex === song.id}
                 addToList={() => handleAddSong(song)}
@@ -335,7 +339,7 @@ export default function PersistentDrawerLeft() {
           </DrawerHeader>
           <Divider />
           <List>
-            {songItemList?.map((song: SongListRight) => (
+            {songListRight?.map((song: SongListRight) => (
               <NavListItem
                 selected={selectedIndex === song.id}
                 removeSong={() => handleRemoveSong(song)}
@@ -346,7 +350,7 @@ export default function PersistentDrawerLeft() {
             ))}
           </List>
           <Divider />
-          <PrintToPdf songs={songItemList}></PrintToPdf>
+          <PrintToPdf songs={songListRight}></PrintToPdf>
         </Drawer>
 
         <Main open1={open1} open2={open2}>

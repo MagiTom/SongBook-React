@@ -11,7 +11,7 @@ import { useTransposeContext } from "../../context/TransposeContext";
 import { auth } from "../../firebase-config";
 import "./style.scss";
 import { useSongsDbContext } from "../../context/firebaseContext";
-import { FullSong } from "../../models/SongListLeft.model";
+import { FullSong, SongListLeft } from "../../models/SongListLeft.model";
 
 export const SongPage = () => {
   const { id } = useParams();
@@ -20,20 +20,24 @@ export const SongPage = () => {
   const [song, setSong] = useState<FullSong>();
   const { getByID } = useIndexedDB("songs");
   const {
-    deleteSongFromList,
-    songItemList,
-    deleteFromAllList,
-    setSelectedIndex,
-    allSongList
+    updateSongLists,
+    getSongListAdmin,
+    addSongRight,
+    removeSongRight,
+    editSong,
+    updateSongsRight,
+    addSongListLeft,
+    songListLeft,
+    songListRight
   } = useSongListContext();
   const { setValue } = useTransposeContext();
   const navigate = useNavigate();
   const user = auth.currentUser;
 
   useEffect(() => {
-    setSelectedIndex(id);
+    // setSelectedIndex(id);
     console.log('song', id)
-      const song = songItemList?.find((song: SongPageItem) => song?.id === id);
+      const song = songListRight?.find((song: SongListLeft) => song?.id === id);
       if (song) {
         setSong(song);
         setSongDB(song);
@@ -43,24 +47,19 @@ export const SongPage = () => {
           console.log('song', songEl)
           let songToShow = songEl;
           if(!songEl) {
-            songToShow = allSongList?.find((song: SongPageItem) => song?.id === id);
+            songToShow = songListLeft?.find((song: SongPageItem) => song?.id === id);
           }
           setSong(songToShow);
         });
         setValue(0);
       }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, songItemList]);
+  }, [id, songListRight]);
 
   const handleRemove = async () => {
     console.log('song', song)
     if(id && song)
    await deleteSongDb({...song, id});
-    if (songDB) {
-      deleteFromAllList(songDB.id);
-    } else {
-      await deleteSongFromList(id);
-    }
     navigate("/");
   };
 

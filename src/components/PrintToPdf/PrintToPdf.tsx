@@ -4,8 +4,9 @@ import ReactToPrint from "react-to-print";
 import { SongPageItem } from "../../constans/songList";
 import { SongView } from "../SongView/SongView";
 import "./style.scss";
+import { SongListRight } from "../../models/SongListRight.model";
 
-const PrintToPdf: React.FC<{ songs: SongPageItem[] }> = ({ songs }) => {
+const PrintToPdf: React.FC<{ songs: SongListRight[] }> = ({ songs }) => {
   const componentRef = useRef(null);
   const contentToPrint = songs.map((song) => (
     <SongView
