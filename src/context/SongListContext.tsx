@@ -1,17 +1,11 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { useIndexedDB } from "react-indexed-db-hook";
-import { SongItem, SongListItem, SongPageItem, SongToAdd } from "../constans/songList";
-import { useTransposeContext } from "./TransposeContext";
-import { useSongsDbContext } from "./firebaseContext";
-import { auth } from "../firebase-config";
+import { createContext, useContext, useState } from "react";
+import { SongListLeft, SongToAddLeft } from "../models/SongListLeft.model";
 import { SongListRight } from "../models/SongListRight.model";
-import { FullSong, SongListLeft, SongToUpdate } from "../models/SongListLeft.model";
+import { useSongsDbContext } from "./firebaseContext";
 
 const SongListContext: React.Context<any> = createContext([]);
 
 export const SonglistProvider: React.FC<any> = ({ children }) => {
-  const { getAll, add, deleteRecord } = useIndexedDB("songs");
-  const { semitones } = useTransposeContext();
   const {
     getSongListDb,
     getSongDb,
@@ -19,69 +13,55 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
     addSongDb,
     getChoosenDb,
     addChoosenDb,
+    deleteSongDb,
     deleteChoosenDb,
     updateChoosenDb,
   } = useSongsDbContext();
   const [songListRight, setSongListRight] = useState<SongListRight[]>([]);
   const [songListLeft, setSongListLeft] = useState<SongListLeft[]>([]);
-  const [selectedIndex, setSelectedIndex] = useState<string>();
-  const user = auth.currentUser;
 
-  async function addSongListLeft(song: SongToAdd) {
+  async function addSongListLeft(song: SongToAddLeft) {
    const id = await addSongDb(song);
     console.log(song);
     const songToAdd: SongListLeft = {
-      category: song.category,
-      title: song.title,
-      added: !!songListRight.find((x: SongListRight) => x.id === id) || false,
+      ...song,
       id,
     };
     setSongListLeft([...songListLeft, songToAdd]);
   }
 
-  function updateSongLists(song: SongListRight) {
+  function updateSongLists(song: SongListRight, semitones: number) {
+    updateRight(song);
+    updateLeft(song, semitones);
+  }
+
+  const updateLeft = (song: SongListRight, semitones: number) =>{
     const songToAdd: SongListLeft = {
       category: song.category,
       title: song.title,
       id: song.id,
-      added: !!songListRight.find((x: SongItem) => x.id === song.id) || false
+      semitones,
+      added: songListRight?.some((item: SongListRight) => item.id === song.id)
     };
-
-    const updateLeft = songListLeft.map((el) => {
-      if (el.id === song.id) {
-        return songToAdd;
-      }
-      return el;
-    });
-    const updateRight = songListRight.map((el) => {
-      if (el.id === song.id) {
-        return { ...song };
-      }
-      return el;
-    });
-
-    setSongListLeft([...updateLeft]);
-    setSongListRight([...updateRight]);
-  }
-
-  const updateLeft = (songToAdd: SongListLeft) =>{
     const updateLeft = songListLeft.map((el) => {
       if (el.id === songToAdd.id) {
         return songToAdd;
       }
       return el;
     });
+    console.log('updateLeft', updateLeft)
     setSongListLeft([...updateLeft]);
   }
 
   const updateRight = (song: SongListRight) =>{
-    const updateRight = songListRight.map((el) => {
-      if (el.id === song.id) {
-        return { ...song };
-      }
-      return el;
-    });
-    setSongListRight([...updateRight]);
+    const updateIndex = songListRight.findIndex(el => song.id === el.id);
+    if (updateIndex !== -1){
+      songListRight[updateIndex] = song;
+      setSongListRight([...songListRight]);
+    } else {
+      setSongListRight([...songListRight, song]);
+    }
+
   }
 
 
@@ -89,70 +69,101 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
     const updatedAllList = songListLeft.filter((el) => el.id !== id);
     setSongListLeft(updatedAllList);
   }
+  function deleteSongFromRight(id: string) {
+    const updatedAllList = songListRight.filter((el) => el.id !== id);
+    setSongListRight(updatedAllList);
+  }
 
-  const removeSong = () => {
-
+  const removeSong = async (song: SongListRight, semitones: number) => {
+      const songRighIndex =  songListRight.findIndex(el => el.id === song.id);
+      const songToDelete: SongListLeft = {
+        id: song.id,
+        category: song.category,
+        title: song.title,
+        semitones
+      };
+      if(songRighIndex !== -1){
+       await deleteChoosenDb(song);
+       deleteSongFromRight(song.id);
+      }
+      await deleteSongDb(songToDelete);
+      deleteSongFromLeft(song.id)
   }
 
 
   const getSongListAdmin = () => {
-    getSongListDb().then((res: SongListItem[]) => {
+    getSongListDb().then((res: SongListLeft[]) => {
       getChoosenDb().then((songs: SongListRight[]) => {
         const updatedChoosenList = res?.map((song) => {
           const isAdded = songs?.some((item: SongListRight) => item.id === song.id);
           return {
             ...song,
             added: isAdded,
+            semitones: song.semitones
           };
         });
+        console.log('updatedChoosenList', updatedChoosenList)
+        console.log('songs', songs)
+        console.log('res', res)
         setSongListLeft(updatedChoosenList || []);
         setSongListRight(songs);
       });
     });
   };
 
-  function addSongRight(song: SongToUpdate) {
+  function addSongRight(song: SongListLeft) {
     getSongDb(song.id).then((item) => {
       console.log(song);
       const songToAdd: SongListRight = {
-        ...song,
-        semitones,
+        id: song.id,
+        title: item.title,
+        category: item.category,
         text: item.text,
-        // songId: song.id
       };
       addChoosenDb(songToAdd).then((res) => {
-        updateSongLists(songToAdd)
+        updateRight(songToAdd);
+        updateAddedValue(song.id, true);
       });
     });
+  }
+
+  function updateAddedValue(id: string, added: boolean){
+    const updatedAllList = songListLeft.map((el) => {
+      if (el.id === id) {
+        return { ...el, added };
+      }
+      return el;
+    });
+    setSongListLeft(updatedAllList);
   }
 
   function removeSongRight(song: SongListRight) {
     deleteChoosenDb(song).then((res) => {
       console.log('idddd remove', song)
-      const updatedSongs = songListRight.filter((item) => {
-        return song.id !== item.id;
-      });
-      setSongListRight(updatedSongs);
-      const updatedAllList = songListLeft.map((el) => {
-        if (el.id === song.id) {
-          return { ...el, added: false };
-        }
-        return el;
-      });
-      setSongListLeft(updatedAllList);
+     deleteSongFromRight(song.id)
+      updateAddedValue(song.id, false);
     });
   }
-  function updateSongsRight(song: SongListRight) {
+  function updateSongsRight(song: SongListRight, semitones: number) {
     updateChoosenDb(song).then(() =>{
-      updateSongLists(song);
+      updateSongLists(song, semitones);
     })
   }
-  function editSong(song: SongListRight) {
+  async function editSong(song: SongListRight, semitones: number) {
     console.log('songToedit', song);
-    updateSongDb(song).then(() =>{
-      updateSongLists(song);
-    })
+    const checkIfInRight = songListRight.find(el => el.id === song.id);
+    await updateSongDb(song, semitones);
+    if(checkIfInRight){
+      await updateChoosenDb(song);
+    }
+    updateSongLists(song, semitones);
   }
+  async function updateSemitones(song: SongListRight, semitones: number) {
+    console.log('songToedit', song);
+    await updateSemitones(song, semitones);
+    updateLeft(song, semitones);
+  }
+  
 
   return (
     <SongListContext.Provider
@@ -161,9 +172,11 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
         getSongListAdmin,
         addSongRight,
         removeSongRight,
+        removeSong,
         editSong,
         updateSongsRight,
         addSongListLeft,
+        updateSemitones,
         songListLeft,
         songListRight
       }}

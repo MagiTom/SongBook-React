@@ -1,12 +1,12 @@
 import AddIcon from '@mui/icons-material/Add';
 import IconButton from "@mui/material/IconButton";
 import React from "react";
-import { SongItem } from "../../constans/songList";
 import "./style.scss";
+import { SongListLeft } from '../../models/SongListLeft.model';
 
 export interface SongItemProp {
-song: SongItem;
-addSongToList: (songItem: SongItem) => void;
+song: SongListLeft;
+addSongToList: (songItem: SongListLeft) => void;
 goToPage: () => void;
 }
 

@@ -1,33 +1,25 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import SongTitle from "../../components/SongTitle/SongTitle";
-import { SongItem } from "../../constans/songList";
 import { useSongListContext } from "../../context/SongListContext";
-import { auth } from "../../firebase-config";
+import { SongListLeft } from "../../models/SongListLeft.model";
 
 export const CategoryPage = () => {
   const { category } = useParams();
-  const [songListItems, setSongListItems] = useState<SongItem[]>([]);
-  const {      updateSongLists,
-    getSongListAdmin,
+  const [songListItems, setSongListItems] = useState<SongListLeft[]>([]);
+  const {      
     addSongRight,
-    removeSongRight,
-    editSong,
-    updateSongsRight,
-    addSongListLeft,
-    songListLeft,
-    songListRight } = useSongListContext();
+    songListLeft } = useSongListContext();
   const navigate = useNavigate();
-  const user = auth.currentUser; 
 
   useEffect(() => {
     const findSongByCategory = songListLeft.filter(
-      (song: SongItem) => song.category === category
+      (song: SongListLeft) => song.category === category
     );
     setSongListItems(category ? findSongByCategory : songListLeft);
   }, [category, songListLeft]);
 
-  const addSongItem = async (song: SongItem) => {
+  const addSongItem = async (song: SongListLeft) => {
     addSongRight(song);
   };
 

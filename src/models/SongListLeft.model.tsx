@@ -1,20 +1,31 @@
-export interface SongListLeft {
+export interface SongListLeft extends SongToAddLeft {
     id: string;
-    title: string;
-    category: string;
+}
+
+export interface SongToAddLeft {
+    title: string,
+    category: string,
+    text?: string,
+    semitones: number,
     added?: boolean;
 }
 
-export interface FullSong extends SongListLeft{
-text: string;
-}
-
-export interface SongToAdd {
+export interface SongTextItem{
     title: string,
     category: string,
     text: string,
 }
 
-export interface SongToUpdate extends SongToAdd{
+
+export interface FullSong{
     id: string;
+    title: string,
+    category: string,
+    text: string,
+    semitones: number,
+    added: boolean;
 }
+
+// export interface SongToUpdateLeft extends SongToAddLeft{
+//     id: string;
+// }

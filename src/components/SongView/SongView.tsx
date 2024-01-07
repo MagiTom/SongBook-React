@@ -1,30 +1,23 @@
 import { useEffect, useRef, useState } from "react";
-import { useIndexedDB } from "react-indexed-db-hook";
-import { SongPageItem } from "../../constans/songList";
 import { useTransposeContext } from "../../context/TransposeContext";
 import { Chords } from "../Chords/Chords";
 import Lyrics from "../Lyrics/Lyrics";
 import { TransposeControl } from "../TranponseControl/TransposeControl";
 import "./style.scss";
-import { useSongsDbContext } from "../../context/firebaseContext";
-import { auth } from "../../firebase-config";
 import { useSongListContext } from "../../context/SongListContext";
+import { SongListRight } from "../../models/SongListRight.model";
 
 export const SongView: React.FC<{
-  song: SongPageItem;
-  inDb: boolean;
+  song: SongListRight;
   id: string;
   isPrintMode?: boolean;
 }> = (props) => {
   const [songArr, setSongArr] = useState<string[] | undefined>([]);
-  const [songItem, setSongItem] = useState<SongPageItem>();
-  const { update } = useIndexedDB("songs");
-  const { getCategoriesDb } = useSongsDbContext();
-  const { updateSongAdmin } = useSongListContext();
+  const [songItem, setSongItem] = useState<SongListRight>();
+  const { updateSemitones } = useSongListContext();
   const { semitones } = useTransposeContext();
   const [isOverflowing, setIsOverflowing] = useState(false);
   const textRef = useRef<any>(null);
-  const user = auth.currentUser; 
   useEffect(() => {
     const element = textRef.current;
     if (element.offsetHeight > window.innerHeight) {
@@ -52,20 +45,7 @@ export const SongView: React.FC<{
     setSongArr(arr);
   }, [props.song]);
   const changeSemiTones = (ev: number) => {
-    console.log('user====', user)
-    if (props.inDb) {
-      const songToUpdate = props.song;
-      const newUpdate = {
-        semitones: `${ev}`,
-        added: false,
-        title: songToUpdate.title,
-        category: songToUpdate.category,
-        text: songToUpdate.text,
-        songId: props.song.songId,
-      };
-      console.log('upadate', newUpdate)
-      updateSongAdmin(props.song.id, newUpdate)
-    }
+      updateSemitones(props.song, ev)
   };
   return (
     <div className="song page-break" ref={textRef}>

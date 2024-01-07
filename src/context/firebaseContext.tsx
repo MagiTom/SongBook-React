@@ -1,28 +1,15 @@
-import {
-  addDoc,
-  collection,
-  deleteDoc,
-  doc,
-  getDoc,
-  getDocs,
-  updateDoc,
-} from "firebase/firestore";
+
 import React, { useContext, useState } from "react";
 import { Category } from "../constans/categories";
 import {
-  SongItem,
-  SongListItem,
   SongPageItem,
-  SongToAdd,
-  SongToAddWithText,
 } from "../constans/songList";
 import { db } from "../firebase-config";
 import { useErrorContext } from "./ErrorContext";
 import firebase from "firebase/compat/app";
 import {
-  FullSong,
   SongListLeft,
-  SongToUpdate,
+  SongToAddLeft,
 } from "../models/SongListLeft.model";
 import { SongListRight } from "../models/SongListRight.model";
 
@@ -31,13 +18,14 @@ export interface User {
 }
 
 export interface SongsDbModel {
-  songListDb: SongListLeft[] | undefined;
+  // songListDb: SongListLeft[] | undefined;
   categoriesDb: Category[];
-  addSongDb: (song: SongToAdd) => Promise<string>;
+  addSongDb: (song: SongToAddLeft) => Promise<string>;
   getSongDb: (id: string) => Promise<SongListLeft | any>;
-  deleteSongDb: (song: FullSong) => Promise<void>;
-  updateSongDb: (song: SongToUpdate) => Promise<void>;
-  getSongListDb: () => Promise<SongListItem[]>;
+  deleteSongDb: (song: SongListLeft) => Promise<void>;
+  updateSongDb: (song: SongListRight, semitones: number) => Promise<void>;
+  updateSemitones: (song: SongListRight, semitones: number) => Promise<void>;
+  getSongListDb: () => Promise<SongListLeft[]>;
   getChoosenDb: () => Promise<SongListRight[]>;
   addChoosenDb: (song: SongPageItem) => Promise<SongListRight[] | any[]>;
   deleteChoosenDb: (choosenSong: SongListRight) => Promise<void>;
@@ -49,12 +37,13 @@ export interface SongsDbModel {
 }
 
 const SongsDbContext = React.createContext<SongsDbModel>({
-  songListDb: [],
+  // songListDb: [],
   categoriesDb: [],
   addSongDb: () => Promise.resolve(''),
   getSongDb: () => Promise.resolve(null),
   deleteSongDb: () => Promise.resolve(),
   updateSongDb: () => Promise.resolve(),
+  updateSemitones: () => Promise.resolve(),
   getCategoriesDb: () => Promise.resolve(),
   addCategoryDb: () => Promise.resolve(),
   deleteCategoryDb: () => Promise.resolve(),
@@ -67,11 +56,8 @@ const SongsDbContext = React.createContext<SongsDbModel>({
 });
 
 export const SongsDbProvider: React.FC<any> = ({ children }) => {
-  const [songListDb, setSongListDb] = useState<SongListItem[] | undefined>();
+  // const [songListDb, setSongListDb] = useState<SongListItem[] | undefined>();
   const [categoriesDb, setCategoriesDb] = useState<Category[]>([]);
-  const collectionRef = collection(db, "songs");
-  const collectionCategoryRef = collection(db, "categories");
-  const collectionChoosenRef = collection(db, "choosenSongs");
   const { addError } = useErrorContext();
   const user = firebase.auth().currentUser;
 
@@ -160,15 +146,11 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
         await userRef.update({
           [collection]: userElements,
         });
-
-        console.log("Piosenka zaktualizowana pomyślnie!");
       } else {
-        console.log("Nie znaleziono piosenki o podanym ID.");
         addError("Nie znaleziono piosenki o podanym ID.");
         throw "Nie znaleziono piosenki o podanym ID.";
       }
     } else {
-      console.log("Użytkownik nie istnieje lub nie ma piosenek.");
       addError("Użytkownik nie istnieje lub nie ma piosenek.");
       throw "Użytkownik nie istnieje lub nie ma piosenek.";
     }
@@ -180,11 +162,14 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
    };
 
   const addCategoryDb = async (category: Category) => {
-    addElementToDb(category, "categories");
+   await addElementToDb(category, "categories");
+    setCategoriesDb([...categoriesDb, category]);
   };
 
   const deleteCategoryDb = async (category: Category) => {
-    deleteElementDb(category, "categories");
+   await deleteElementDb(category, "categories");
+   const updatedList = categoriesDb.filter(item => item.id !== category.id);
+   setCategoriesDb([...updatedList]);
   };
 
   const getChoosenDb = async (): Promise<SongListRight[] | any[]> => {
@@ -192,16 +177,16 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
   };
 
   const addChoosenDb = async (
-    song: SongPageItem
-  ): Promise<SongPageItem[] | any[]> => {
-    return addElementToDb({ ...song, id: song.songId }, "choosenSongs");
+    song: SongListRight
+  ): Promise<SongListRight[] | any[]> => {
+    return addElementToDb({ ...song, id: song.id }, "choosenSongs");
   };
 
   const deleteChoosenDb = async (choosenSong: SongListRight) => {
     deleteElementDb(choosenSong, "choosenSongs");
   };
 
-  const updateChoosenDb = async (song: SongPageItem): Promise<void> => {
+  const updateChoosenDb = async (song: SongListRight): Promise<void> => {
     await updateElementDb(song, "choosenSongs");
   };
 
@@ -232,11 +217,12 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
     }
   };
 
-  const addSongDb = async (song: SongToAdd): Promise<string> => {
+  const addSongDb = async (song: SongToAddLeft): Promise<string> => {
     try {
       const songToAdd = {
         category: song.category,
         title: song.title,
+        semitones: 0
       };
   
       const el = await addElementToDb(songToAdd, "songs");
@@ -252,7 +238,7 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
     }
   };
 
-  const addSongTextToUser = async (song: SongToUpdate): Promise<string> => {
+  const addSongTextToUser = async (song: SongListLeft): Promise<string> => {
     try {
       const userRef = firebase
         .firestore()
@@ -278,14 +264,9 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
     }
   };
 
-  const deleteSongDb = async (song: FullSong) => {
+  const deleteSongDb = async (song: SongListLeft) => {
     try {
-      const songToDelete = {
-        id: song.id,
-        category: song.category,
-        title: song.title,
-      };
-      await deleteElementDb(songToDelete, "songs");
+      await deleteElementDb(song, "songs");
       await deleteSongTextFromUser(song.id);
     } catch (error) {
       console.error("Błąd podczas usuwania piosenki:", error);
@@ -315,16 +296,22 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
     }
   };
 
-  const updateSongDb = async (song: SongToUpdate) => {
-    const songToAdd = {
-      category: song.category,
-      title: song.title,
-    };
-    await updateElementDb(songToAdd, "songs");
+  const updateSongDb = async (song: SongListRight, semitones: number) => {
+    await updateSemitones(song, semitones);
     await updateSongTextForUser(song);
   };
 
-  const updateSongTextForUser = async (song: SongToUpdate) => {
+ const updateSemitones = async (song: SongListRight, semitones: number) => {
+    const songToAdd = {
+      category: song.category,
+      title: song.title,
+      id: song.id,
+      semitones: semitones
+    };
+    await updateElementDb(songToAdd, "songs");
+  }
+
+  const updateSongTextForUser = async (song: SongListRight) => {
     try {
       const userRef = firebase
         .firestore()
@@ -349,7 +336,6 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
   return (
     <SongsDbContext.Provider
       value={{
-        songListDb,
         categoriesDb,
         createUserDocument,
         getChoosenDb,
@@ -364,6 +350,7 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
         updateSongDb,
         getSongListDb,
         getSongDb,
+        updateSemitones
       }}
     >
       {children}

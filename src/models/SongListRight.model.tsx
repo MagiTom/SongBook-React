@@ -1,6 +1,8 @@
 import { SongListLeft } from "./SongListLeft.model";
 
-export interface SongListRight extends SongListLeft{
-    semitones: number;
-    text: string;
+export interface SongListRight {
+    id: string;
+    title: string,
+    category: string,
+    text: string,
 }

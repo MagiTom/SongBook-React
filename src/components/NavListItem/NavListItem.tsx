@@ -5,11 +5,12 @@ import ListItem from "@mui/material/ListItem/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import { SongItem } from "../../constans/songList";
 import "./style.scss";
+import { SongListLeft } from '../../models/SongListLeft.model';
+import { SongListRight } from '../../models/SongListRight.model';
 
 interface NavListItemProps{
-  song: SongItem,
+  song: SongListLeft | SongListRight,
   selected: boolean,
   goToPage: () => void, 
   addToList?: () => void,  
@@ -33,11 +34,14 @@ export const NavListItem: React.FC<NavListItemProps> = ({ song, goToPage, addToL
       removeSong();
     }
   };
+  const isSongListLeft = (song: any): song is SongListLeft => {
+    return 'added' in song;
+  };
 
   return (
     <>
       <ListItem sx={{pt: 0, pb: 0, pr: 0, pl: 0.5}} onClick={() => goToPage()}>
-    {addToList && <Tooltip title="Dodaj" arrow><ListItemIcon className={song?.added ? 'hidden' : ''} onClick={handleAddToList}>{<AddCircleIcon />}</ListItemIcon></Tooltip>}
+    {addToList && <Tooltip title="Dodaj" arrow><ListItemIcon className={isSongListLeft(song) && song.added ? 'hidden' : ''} onClick={handleAddToList}>{<AddCircleIcon />}</ListItemIcon></Tooltip>}
     {removeSong && <Tooltip title="Usuń" arrow><ListItemIcon onClick={handleRemoveSong}>{<RemoveCircleIcon />}</ListItemIcon></Tooltip>}
         <ListItemButton selected={selected} sx={{padding: 0.5}}>
           <ListItemText      primaryTypographyProps={{

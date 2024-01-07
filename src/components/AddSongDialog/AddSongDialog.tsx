@@ -21,14 +21,15 @@ import { useSongListContext } from "../../context/SongListContext";
 import { useSongsDbContext } from "../../context/firebaseContext";
 import AlertDialog from "../AlertDialog/AlertDialog";
 import "./style.scss";
-import { FullSong, SongToUpdate } from "../../models/SongListLeft.model";
+import { SongListRight } from "../../models/SongListRight.model";
+import { SongToAddLeft } from "../../models/SongListLeft.model";
 
 export type SongProps = {
-  song?: FullSong;
+  song?: SongListRight;
+  semitones: number;
 };
 
 const AddSongDialog: React.FC<SongProps> = (prop) => {
-  const { addSongDb, updateSongDb } = useSongsDbContext();
   const [open, setOpen] = React.useState(false);
   const [submitted, setSubmitted] = React.useState(false);
   const [title, setTitle] = React.useState<string>("");
@@ -37,12 +38,7 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
   const [newCategory, setNewCategory] = React.useState<string>("");
   const [editMode, setEditMode] = React.useState<boolean>(false);
   const {
-    updateSongLists,
-    getSongListAdmin,
-    addSongRight,
-    removeSongRight,
     addSongListLeft,
-    updateSongAdmin,
     editSong
   } = useSongListContext();
   const { categoriesDb, deleteCategoryDb, addCategoryDb } = useSongsDbContext();
@@ -67,10 +63,11 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
   const handleAddSong = async () => {
     setSubmitted(true);
     if (title && category && text) {
-      const songToAdd: SongToAdd = {
+      const songToAdd: SongToAddLeft = {
         title,
         category,
         text,
+        semitones: prop.semitones
       };
       addSongListLeft(songToAdd);
       clearData();
@@ -79,7 +76,13 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
   };
 
   const handleEditSong = async () => {
-    editSong(prop.song);
+    const songToAdd: SongListRight = {
+      title,
+      category,
+      text,
+      id: prop.song?.id || ''
+    };
+    editSong(songToAdd, prop.semitones);
     clearData();
     handleClose();
   };

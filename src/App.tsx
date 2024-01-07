@@ -119,11 +119,8 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 export default function PersistentDrawerLeft() {
   const theme = useTheme();
   const {
-    addSong,
-    removeSong,
     songItemList,
-    allSongList,
-    setSelectedIndex,
+    // setSelectedIndex,
     selectedIndex,
   } = useSongListContext();
   const [open1, setOpen1] = React.useState(true);
@@ -131,13 +128,9 @@ export default function PersistentDrawerLeft() {
   const [user, setUser] = useState<User | null>();
   const { getCategoriesDb } = useSongsDbContext();
   const {
-    updateSongLists,
     getSongListAdmin,
     addSongRight,
     removeSongRight,
-    editSong,
-    updateSongsRight,
-    addSongListLeft,
     songListLeft,
     songListRight
   } = useSongListContext();
@@ -183,7 +176,7 @@ export default function PersistentDrawerLeft() {
   };
 
   const goToPage = (id: string) => {
-    setSelectedIndex(id);
+    // setSelectedIndex(id);
     const url = id ? `/song/${id}` : "/";
     return navigate(url);
   };
@@ -232,7 +225,7 @@ export default function PersistentDrawerLeft() {
           </DrawerHeader>
           <Divider />
           <List>
-            {songListLeft.map((song: SongItem) => (
+            {songListLeft.map((song: SongListLeft) => (
               <NavListItem
                 selected={selectedIndex === song.id}
                 addToList={() => handleAddSong(song)}
@@ -253,7 +246,7 @@ export default function PersistentDrawerLeft() {
           >
             <ListItem>
               <div className="footer">
-                {user && <AddSongDialog></AddSongDialog>}
+                {user && <AddSongDialog semitones={0}></AddSongDialog>}
                 <LoginDialog isLogin={!!user?.uid}></LoginDialog>
               </div>
             </ListItem>
