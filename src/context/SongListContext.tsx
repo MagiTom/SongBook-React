@@ -16,6 +16,7 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
     deleteSongDb,
     deleteChoosenDb,
     updateChoosenDb,
+    updateSemitones
   } = useSongsDbContext();
   const [songListRight, setSongListRight] = useState<SongListRight[]>([]);
   const [songListLeft, setSongListLeft] = useState<SongListLeft[]>([]);
@@ -158,7 +159,7 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
     }
     updateSongLists(song, semitones);
   }
-  async function updateSemitones(song: SongListRight, semitones: number) {
+  async function updateSong(song: SongListRight, semitones: number) {
     console.log('songToedit', song);
     await updateSemitones(song, semitones);
     updateLeft(song, semitones);
@@ -176,7 +177,7 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
         editSong,
         updateSongsRight,
         addSongListLeft,
-        updateSemitones,
+        updateSong,
         songListLeft,
         songListRight
       }}

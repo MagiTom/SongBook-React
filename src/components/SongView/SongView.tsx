@@ -14,7 +14,7 @@ export const SongView: React.FC<{
 }> = (props) => {
   const [songArr, setSongArr] = useState<string[] | undefined>([]);
   const [songItem, setSongItem] = useState<SongListRight>();
-  const { updateSemitones } = useSongListContext();
+  const { updateSong } = useSongListContext();
   const { semitones } = useTransposeContext();
   const [isOverflowing, setIsOverflowing] = useState(false);
   const textRef = useRef<any>(null);
@@ -45,7 +45,7 @@ export const SongView: React.FC<{
     setSongArr(arr);
   }, [props.song]);
   const changeSemiTones = (ev: number) => {
-      updateSemitones(props.song, ev)
+    updateSong(props.song, ev)
   };
   return (
     <div className="song page-break" ref={textRef}>
