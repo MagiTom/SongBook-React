@@ -14,7 +14,7 @@ const AuthGuard = ({ component }) => {
     try {
     const user = auth.currentUser;
       if (!user) {
-        navigate(`/login`);
+        // navigate(`/login`);
       }
       setStatus(true);
       return;
