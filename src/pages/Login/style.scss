@@ -1,0 +1,63 @@
+.login{
+
+    &__row{
+        display: flex;
+        min-height: 100vh;
+    }
+    &__col:last-child{
+        flex: 2;
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        align-items: center;
+    }
+    &__col:first-child{
+        position: relative;
+        background-image: url('../../images/guitar.jpg');
+        background-position: bottom;
+        background-size: cover;
+        flex: 2;
+    }
+    &__box{
+        padding: 2em;
+        text-align: center;
+        width: 65%;
+    }
+   &__title{
+       color: rgba(0, 0, 0, 0.54);
+       text-transform: uppercase;
+     }
+     &__info{
+        position: absolute;
+        text-align: center;
+        bottom: 2em;
+        left: 50%;
+        transform: translateX(-50%);
+        color: white;
+        opacity: 0.7;
+        font-weight: lighter;
+        padding: 1.5em 2em;
+        border-radius: 5px;
+        background-color: rgba(255, 255, 255, 0.1);
+        text-transform: uppercase;
+        width: 70%;
+     }
+}
+.fade-in-image { animation: fadeIn .5s ease-in-out; }
+@keyframes fadeIn {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+@media (max-width: 480px) {
+    .login{
+        &__row{
+            flex-direction: column;
+        }
+        &__col:first-child{
+        flex: 3;
+        }
+    }
+
+  }
+

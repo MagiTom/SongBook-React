@@ -7,7 +7,7 @@ import { SongListRight } from "../../models/SongListRight.model";
 
 const PrintToPdf: React.FC<{ songs: SongListRight[] }> = ({ songs }) => {
   const componentRef = useRef(null);
-  const contentToPrint = songs.map((song) => (
+  const contentToPrint = songs?.map((song) => (
     <SongView
       key={song.id}
       song={song}

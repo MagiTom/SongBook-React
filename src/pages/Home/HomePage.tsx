@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Outlet, useNavigate, useParams } from "react-router-dom";
-import CategoryButton from "../components/CategoryButton/CategoryButton";
-import { useSongsDbContext } from "../context/firebaseContext";
+import CategoryButton from "../../components/CategoryButton/CategoryButton";
+import { useSongsDbContext } from "../../context/firebaseContext";
 import "./style.scss";
 
 export const HomePage = () => {
@@ -23,7 +23,7 @@ export const HomePage = () => {
   return (
     <div className="home">
       <div className="categories">
-        {categoriesDb.map((category) => (
+        {categoriesDb?.map((category) => (
           <CategoryButton
             marked={category.name === categoryItem}
             key={category.id}
