@@ -4,14 +4,7 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import MenuIcon from "@mui/icons-material/Menu";
 import MusicNoteIcon from "@mui/icons-material/MusicNote";
-import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Button,
-  ListItem,
-  useMediaQuery,
-} from "@mui/material";
+import { Button, ListItem, useMediaQuery } from "@mui/material";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -45,8 +38,6 @@ import { DBConfig } from "../../lib/DBConfig";
 import { SongListLeft } from "../../models/SongListLeft.model";
 import { SongListRight } from "../../models/SongListRight.model";
 import "./style.scss";
-import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 
 type ModeType = "light" | "dark";
 
@@ -146,7 +137,7 @@ export default function PersistentDrawerLeft() {
   const navigate = useNavigate();
   const matches = useMediaQuery("(max-width: 480px)");
 
-  console.log("songItemListyyyyyyy", songListLeft);
+  console.log("songItemList", songItemList);
 
   useEffect(() => {
     const mode: ModeType = localStorage.getItem("currentMode") as ModeType;
@@ -240,7 +231,7 @@ export default function PersistentDrawerLeft() {
             </IconButton>
           </DrawerHeader>
           <Divider />
-          {/* <List>
+          <List>
             {songListLeft.map((song: SongListLeft) => (
               <NavListItem
                 selected={selectedIndex === song.id}
@@ -250,30 +241,7 @@ export default function PersistentDrawerLeft() {
                 key={song.id}
               ></NavListItem>
             ))}
-          </List> */}
-          {songListLeft.map((song: any) => (
-            <Accordion>
-              <AccordionSummary
-                expandIcon={<ArrowDropDownIcon />}
-                aria-controls="panel2-content"
-                id="panel2-header"
-              >
-                <Typography>{song.category}</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                {song.items.map((item: any) => (
-                  <NavListItem
-                    selected={selectedIndex === item.id}
-                    addToList={() => handleAddSong(item)}
-                    goToPage={() => goToPage(item.id)}
-                    song={item}
-                    key={item.id}
-                  ></NavListItem>
-                ))}
-              </AccordionDetails>
-            </Accordion>
-          ))}
-
+          </List>
           <Divider />
 
           <List

@@ -103,40 +103,10 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
             semitones: song.semitones
           };
         });
-
-        const groupedByCategory = updatedChoosenList.reduce((result: any, currentItem: any) => {
-          // Sprawdź, czy istnieje już grupa o danej kategorii
-          const existingGroup = result.find((group: any) => group.category === currentItem.category);
-      
-          // Jeśli grupa już istnieje, dodaj obiekt do istniejącej grupy
-          if (existingGroup) {
-              existingGroup.items.push({
-                  id: currentItem.id,
-                  semitones: currentItem.semitones,
-                  title: currentItem.title,
-                  added: currentItem.added
-              });
-          }
-          // Jeśli grupa nie istnieje, stwórz nową grupę
-          else {
-              result.push({
-                  category: currentItem.category,
-                  items: [{
-                     ...currentItem
-                  }]
-              });
-          }
-      
-          return result;
-      }, []);
-        console.log('updatedChoosenList', groupedByCategory)
-       
-        // console.log('songs', updatedChoosenList.reduce((catMemo: any, song) => {
-        //   (catMemo[song.category] = catMemo[song.category] || []).push(song);
-        //   return catMemo;
-        // }, {}))
+        console.log('updatedChoosenList', updatedChoosenList)
+        console.log('songs', songs)
         console.log('res', res)
-        setSongListLeft(groupedByCategory || []);
+        setSongListLeft(updatedChoosenList || []);
         setSongListRight(songs);
       });
     });
