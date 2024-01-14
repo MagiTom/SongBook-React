@@ -37,7 +37,7 @@ export const CategoryPage: React.FC<any> = () => {
   function setFilter(value: string): void {
     setFilterValue(value);
     const filteredData = [...songListItemsCopy].filter((obj) =>
-      obj.title.includes(value)
+      obj.title.toLowerCase().includes(value.toLowerCase())
     );
     setSongListItems(filteredData);
   }

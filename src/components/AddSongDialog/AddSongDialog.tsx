@@ -93,12 +93,14 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
     setCategory(event.target.value);
   };
   const addCategory = async () => {
-    const categororyItem: Category = {
-      name: newCategory,
-    };
-    await addCategoryDb(categororyItem);
-    setCategory(categororyItem.name);
-    setNewCategory("");
+    if(newCategory){
+      const categororyItem: Category = {
+        name: newCategory,
+      };
+      await addCategoryDb(categororyItem);
+      setCategory(categororyItem.name);
+      setNewCategory("");
+    }
   };
   const deleteCategory = async (categoryItem: Category) => {
     await deleteCategoryDb(categoryItem);
@@ -150,7 +152,7 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
                 label="kategoria"
                 onChange={(event) => handleChangeCategory(event)}
               >
-                {categoriesDb.map((category) => (
+                {categoriesDb?.map((category) => (
                   <MenuItem value={category.name} key={category.id}>
                     <div className="category__item">
                       <p>{category.name}</p>

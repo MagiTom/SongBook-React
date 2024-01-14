@@ -19,14 +19,15 @@ export const SongPage = () => {
   const [song, setSong] = useState<SongListRight>();
   const {
     songListLeft,
-    removeSong
+    removeSong,
+    setSelectedIndex
   } = useSongListContext();
   const { setValue } = useTransposeContext();
   const navigate = useNavigate();
   const user = auth.currentUser;
 
   useEffect(() => {
-    // setSelectedIndex(id);
+    setSelectedIndex(id);
       const songItem = songListLeft?.find((song: SongListLeft) => song?.id === id);
    
         getSongDb(id || '').then((songEl: SongTextItem) => {

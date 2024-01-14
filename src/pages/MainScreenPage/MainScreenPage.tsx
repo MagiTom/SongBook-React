@@ -123,11 +123,11 @@ export default function PersistentDrawerLeft() {
   const theme = useTheme();
   const {
     songItemList,
-    // setSelectedIndex,
+    setSelectedIndex,
     selectedIndex,
   } = useSongListContext();
-  const [open1, setOpen1] = React.useState(true);
-  const [open2, setOpen2] = React.useState(true);
+  const [open1, setOpen1] = useState<boolean>(true);
+  const [open2, setOpen2] = useState<boolean>(true);
   const [user, setUser] = useState<User | null>();
   const { getCategoriesDb } = useSongsDbContext();
   const {
@@ -180,7 +180,7 @@ export default function PersistentDrawerLeft() {
   };
 
   const goToPage = (id: string) => {
-    // setSelectedIndex(id);
+    setSelectedIndex(id);
     const url = id ? `/song/${id}` : "/";
     return navigate(url);
   };
@@ -285,7 +285,7 @@ export default function PersistentDrawerLeft() {
         </Drawer>
 
         <AppBar position="fixed" open1={open1} open2={open2}>
-          <Toolbar>
+          <Toolbar sx={{cursor: 'pointer'}}>
             <IconButton
               color="inherit"
               aria-label="open drawer"

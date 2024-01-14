@@ -25,7 +25,7 @@ const SongTitle: React.FC<SongItemProp> = (props) => {
 
   return (<div onClick={goPage} className="songTitle"><IconButton sx={{padding: 0.5}} className={props.song.added ? 'hidden' : ''} onClick={addToList} color="secondary" aria-label="add an alarm">
   <AddIcon />
-</IconButton><p>{props.song.title}</p></div>);
+</IconButton><p>{props.song.title}</p><span> #{props.song.category}</span></div>);
 };
 
 export default SongTitle;
