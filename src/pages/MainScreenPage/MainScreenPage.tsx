@@ -232,7 +232,16 @@ export default function PersistentDrawerLeft() {
           </DrawerHeader>
           <Divider />
           <List>
-            {songListLeft.map((song: SongListLeft) => (
+            {
+            songListLeft.sort(function (a: SongListLeft, b: SongListLeft) {
+              if (a.title < b.title) {
+                return -1;
+              }
+              if (a.title > b.title) {
+                return 1;
+              }
+              return 0;
+            }).map((song: SongListLeft) => (
               <NavListItem
                 selected={selectedIndex === song.id}
                 addToList={() => handleAddSong(song)}
