@@ -1,20 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth } from "../firebase-config";
+import { onAuthStateChanged } from "firebase/auth";
 
 const AuthGuard = ({ component }) => {
   const [status, setStatus] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    checkToken();
+    onAuthStateChanged(auth, (user) => {
+      checkToken(user);
+    });
   }, [component]);
 
-  const checkToken = async () => {
+  const checkToken = async (user) => {
     try {
-    const user = auth.currentUser;
       if (!user) {
-        // navigate(`/login`);
+        navigate(`/login`);
       }
       setStatus(true);
       return;
