@@ -3,13 +3,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import SongTitle from "../../components/SongTitle/SongTitle";
 import { useSongListContext } from "../../context/SongListContext";
 import { SongListLeft } from "../../models/SongListLeft.model";
+import "./style.scss";
 
-export const CategoryPage = () => {
+export const CategoryPage: React.FC<any> = () => {
   const { category } = useParams();
   const [songListItems, setSongListItems] = useState<SongListLeft[]>([]);
-  const {      
-    addSongRight,
-    songListLeft } = useSongListContext();
+  const { addSongRight, songListLeft } = useSongListContext();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,7 +28,7 @@ export const CategoryPage = () => {
   };
 
   return (
-    <>
+    <div className="list">
       {songListItems?.map((song) => (
         <SongTitle
           goToPage={() => goPage(song.id)}
@@ -38,6 +37,6 @@ export const CategoryPage = () => {
           song={song}
         />
       ))}
-    </>
+    </div>
   );
 };

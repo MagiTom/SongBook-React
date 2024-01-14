@@ -14,6 +14,7 @@ import IconButton from "@mui/material/IconButton";
 import List from "@mui/material/List";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
+
 import {
   ThemeProvider,
   createTheme,
@@ -29,6 +30,7 @@ import AddSongDialog from "../../components/AddSongDialog/AddSongDialog";
 import ErrorModal from "../../components/ErrorModal/ErrorModal";
 import LoginDialog from "../../components/LoginDialog/LoginDialog";
 import { NavListItem } from "../../components/NavListItem/NavListItem";
+import { NavItemDrag } from "../../components/NavItemDrag/NavItemDrag";
 import PrintToPdf from "../../components/PrintToPdf/PrintToPdf";
 import { useErrorContext } from "../../context/ErrorContext";
 import { useSongListContext } from "../../context/SongListContext";
@@ -38,6 +40,9 @@ import { DBConfig } from "../../lib/DBConfig";
 import { SongListLeft } from "../../models/SongListLeft.model";
 import { SongListRight } from "../../models/SongListRight.model";
 import "./style.scss";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 
 type ModeType = "light" | "dark";
 
@@ -131,6 +136,7 @@ export default function PersistentDrawerLeft() {
     removeSongRight,
     songListLeft,
     songListRight,
+    updateChoosenSongList,
   } = useSongListContext();
   const { error } = useErrorContext();
   const [currentMode, setCurrentMode] = React.useState<ModeType>("light"); // Track the current mode
@@ -201,6 +207,11 @@ export default function PersistentDrawerLeft() {
         // An error happened.
       });
   };
+  const moveSong = (fromIndex: any, toIndex: any) => {
+    console.log("fromIndex", fromIndex);
+    console.log("toIndex", toIndex);
+    updateChoosenSongList(fromIndex, toIndex);
+  };
 
   return (
     <ThemeProvider theme={currentMode === "light" ? lightTheme : darkTheme}>
@@ -231,25 +242,26 @@ export default function PersistentDrawerLeft() {
             </IconButton>
           </DrawerHeader>
           <Divider />
-          <List>
-            {
-            songListLeft.sort(function (a: SongListLeft, b: SongListLeft) {
-              if (a.title < b.title) {
-                return -1;
-              }
-              if (a.title > b.title) {
-                return 1;
-              }
-              return 0;
-            }).map((song: SongListLeft) => (
-              <NavListItem
-                selected={selectedIndex === song.id}
-                addToList={() => handleAddSong(song)}
-                goToPage={() => goToPage(song.id)}
-                song={song}
-                key={song.id}
-              ></NavListItem>
-            ))}
+          <List sx={{pt: 0.1}}>
+            {songListLeft
+              .sort(function (a: SongListLeft, b: SongListLeft) {
+                if (a.title < b.title) {
+                  return -1;
+                }
+                if (a.title > b.title) {
+                  return 1;
+                }
+                return 0;
+              })
+              .map((song: SongListLeft) => (
+                <NavListItem
+                  selected={selectedIndex === song.id}
+                  addToList={() => handleAddSong(song)}
+                  goToPage={() => goToPage(song.id)}
+                  song={song}
+                  key={song.id}
+                ></NavListItem>
+              ))}
           </List>
           <Divider />
 
@@ -349,17 +361,21 @@ export default function PersistentDrawerLeft() {
             </IconButton>
           </DrawerHeader>
           <Divider />
-          <List>
-            {songListRight?.map((song: SongListRight) => (
-              <NavListItem
-                selected={selectedIndex === song.id}
-                removeSong={() => handleRemoveSong(song)}
-                goToPage={() => goToPage(!user ? song.id : song?.id || "")}
-                song={song}
-                key={song.id}
-              ></NavListItem>
-            ))}
-          </List>
+          <DndProvider backend={HTML5Backend}>
+            <List sx={{pt: 0.1}}>
+              {songListRight?.map((song: SongListRight, index: number) => (
+                <NavItemDrag
+                  key={song.id}
+                  goToPage={() => goToPage(!user ? song.id : song?.id || "")}
+                  song={song}
+                  selected={selectedIndex === song.id}
+                  removeSong={() => handleRemoveSong(song)}
+                  index={index}
+                  moveSong={moveSong}
+                />
+              ))}
+            </List>
+          </DndProvider>
           <Divider />
           <PrintToPdf songs={songListRight}></PrintToPdf>
         </Drawer>

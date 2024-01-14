@@ -16,7 +16,8 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
     deleteSongDb,
     deleteChoosenDb,
     updateChoosenDb,
-    updateSemitones
+    updateSemitones,
+    updateChoosenListDb
   } = useSongsDbContext();
   const [songListRight, setSongListRight] = useState<SongListRight[]>([]);
   const [songListLeft, setSongListLeft] = useState<SongListLeft[]>([]);
@@ -164,6 +165,15 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
     await updateSemitones(song, semitones);
     updateLeft(song, semitones);
   }
+
+  async function updateChoosenSongList(fromIndex: number, toIndex: number) {
+    const updatedSongs = [...songListRight];
+    const [movedSong] = updatedSongs.splice(fromIndex, 1);
+    updatedSongs.splice(toIndex, 0, movedSong);
+    updateChoosenListDb(updatedSongs);
+    setSongListRight(updatedSongs);
+  }
+  
   
 
   return (
@@ -179,7 +189,8 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
         addSongListLeft,
         updateSong,
         songListLeft,
-        songListRight
+        songListRight,
+        updateChoosenSongList
       }}
     >
       {children}

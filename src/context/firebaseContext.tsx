@@ -34,6 +34,7 @@ export interface SongsDbModel {
   addCategoryDb: (category: Category) => Promise<void>;
   deleteCategoryDb: (category: Category) => Promise<void>;
   createUserDocument: (user: any) => Promise<void>;
+  updateChoosenListDb: (songs: SongListRight[]) => Promise<void>;
 }
 
 const SongsDbContext = React.createContext<SongsDbModel>({
@@ -53,6 +54,7 @@ const SongsDbContext = React.createContext<SongsDbModel>({
   deleteChoosenDb: () => Promise.resolve(),
   updateChoosenDb: () => Promise.resolve(),
   createUserDocument: () => Promise.resolve(),
+  updateChoosenListDb: () => Promise.resolve(),
 });
 
 export const SongsDbProvider: React.FC<any> = ({ children }) => {
@@ -93,6 +95,34 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
       }
     }
   }
+
+ const updateListDb = async (newList: any[], collection: string) =>{
+  const userAuth = firebase.auth().currentUser;
+  if (userAuth) {
+    const userRef = db.collection("users").doc(userAuth.uid);
+    try {
+      const doc = await userRef.get();
+      if (doc.exists) {
+        // Pobierz dane użytkownika
+        const userData = doc.data();
+        if(userData){
+        // Zaktualizuj listę danych
+        userData[collection] = newList;
+
+        // Zaktualizuj dokument użytkownika na Firebase
+        await userRef.update(userData);
+        }
+
+      } else {
+        throw 'Dokument użytkownika nie istnieje.';
+      }
+    } catch (error) {
+      console.error("Błąd podczas aktualizowania danych użytkownika:", error);
+      addError(error);
+      throw error;
+    }
+  }
+ }
 
   const addElementToDb = async (element: any, collection: string): Promise<any> => {
     try {
@@ -188,6 +218,9 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
 
   const updateChoosenDb = async (song: SongListRight): Promise<void> => {
     await updateElementDb(song, "choosenSongs");
+  };
+  const updateChoosenListDb = async (songs: SongListRight[]): Promise<void> => {
+    await updateListDb(songs, "choosenSongs");
   };
 
   const getSongListDb = async (): Promise<SongListLeft[]> => {
@@ -350,7 +383,8 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
         updateSongDb,
         getSongListDb,
         getSongDb,
-        updateSemitones
+        updateSemitones,
+        updateChoosenListDb
       }}
     >
       {children}

@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "target": "es5",
+    "types": ["@types/react-beautiful-dnd"],
     "lib": [
       "dom",
       "dom.iterable",

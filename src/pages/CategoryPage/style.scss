@@ -1,0 +1,14 @@
+@import '../../styles/variables.scss';
+
+.list{
+    column-count: 2;
+    column-rule-style: solid;
+    column-rule-color: $border-color;
+    column-gap: 2em;
+}
+
+@media (max-width: 480px) {
+    .list{
+        column-count: 1;
+    }
+  }
