@@ -11,6 +11,7 @@ export const CategoryPage: React.FC<any> = () => {
   const { category } = useParams();
   const [songListItems, setSongListItems] = useState<SongListLeft[]>([]);
   const [songListItemsCopy, setSongListItemsCopy] = useState<SongListLeft[]>([]);
+  const [filterValue, setFilterValue] = useState<string>('');
   const { addSongRight, songListLeft } = useSongListContext();
   const navigate = useNavigate();
 
@@ -21,6 +22,7 @@ export const CategoryPage: React.FC<any> = () => {
     const list = category ? findSongByCategory : songListLeft;
     setSongListItems(list);
     setSongListItemsCopy(list);
+    setFilterValue('');
   }, [category, songListLeft]);
 
   const addSongItem = async (song: SongListLeft) => {
@@ -33,6 +35,7 @@ export const CategoryPage: React.FC<any> = () => {
   };
 
   function setFilter(value: string): void {
+    setFilterValue(value);
     const filteredData = [...songListItemsCopy].filter((obj) =>
       obj.title.includes(value)
     );
@@ -42,6 +45,7 @@ export const CategoryPage: React.FC<any> = () => {
   return (
     <div className="category-page">
       <TextField
+      value={filterValue}
         color="success"
         autoFocus
         margin="dense"
