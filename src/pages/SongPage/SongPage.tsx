@@ -12,11 +12,15 @@ import { useSongsDbContext } from "../../context/firebaseContext";
 import { SongListLeft, SongTextItem } from "../../models/SongListLeft.model";
 import { SongListRight } from "../../models/SongListRight.model";
 
+export interface SongViewItem extends SongListRight{
+  added: boolean;
+}
+
 export const SongPage = () => {
   const { id } = useParams();
   const { getSongDb } = useSongsDbContext();
   const [songDB, setSongDB] = useState<SongListLeft>();
-  const [song, setSong] = useState<SongListRight>();
+  const [song, setSong] = useState<SongViewItem>();
   const {
     songListLeft,
     removeSong,
@@ -31,9 +35,7 @@ export const SongPage = () => {
       const songItem = songListLeft?.find((song: SongListLeft) => song?.id === id);
    
         getSongDb(id || '').then((songEl: SongTextItem) => {
-          console.log('songEl', songEl)
-          const fullSong: SongListRight = {...songEl, id: id || ''};
-          // setSong(fullSong);
+          const fullSong: SongViewItem = {...songEl, id: id || '', added: songItem?.added};
           setSongDB(songItem);
           setValue(+songItem?.semitones);
           let songToShow = fullSong;
@@ -41,15 +43,12 @@ export const SongPage = () => {
             songToShow = songListLeft?.find((song: SongListLeft) => song?.id === id);
           }
           setSong(songToShow);
-          console.log('songToShow', songToShow)
         });
-        // setValue(0);
       
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, songListLeft]);
 
   const handleRemove = async () => {
-    console.log('song', song)
     if(id && song)
    await removeSong(song, songDB?.semitones);
     navigate("/");

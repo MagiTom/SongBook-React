@@ -7,16 +7,18 @@ import "./style.scss";
 import { useSongListContext } from "../../context/SongListContext";
 import { SongListRight } from "../../models/SongListRight.model";
 import { IconButton, Tooltip } from "@mui/material";
-import VerticalSplitIcon from '@mui/icons-material/VerticalSplit';
+import VerticalSplitIcon from "@mui/icons-material/VerticalSplit";
+import AddIcon from "@mui/icons-material/Add";
+import { SongViewItem } from "../../pages/SongPage/SongPage";
 
 export const SongView: React.FC<{
-  song: SongListRight;
+  song: SongViewItem;
   id: string;
   isPrintMode?: boolean;
 }> = (props) => {
   const [songArr, setSongArr] = useState<string[] | undefined>([]);
   const [songItem, setSongItem] = useState<SongListRight>();
-  const { updateSong } = useSongListContext();
+  const { updateSong, addSongRight } = useSongListContext();
   const { semitones } = useTransposeContext();
   const [isOverflowing, setIsOverflowing] = useState(false);
   const textRef = useRef<any>(null);
@@ -25,11 +27,11 @@ export const SongView: React.FC<{
     ? { columnCount: 2 }
     : { columnCount: 1 };
 
-
   useEffect(() => {
-    const songItemEl = props.song;
+    const songItemEl: any = { ...props.song };
+    delete songItemEl.added;
     setSongItem(songItemEl);
-    const pre = songItemEl?.text;
+    const pre = props.song?.text;
     let arr: string[] | undefined = pre?.split("\n");
     for (let i = 0; i < arr?.length - 1; i++) {
       if (
@@ -41,12 +43,18 @@ export const SongView: React.FC<{
         i++;
       }
     }
-    console.log("arr", arr);
     setSongArr(arr);
-  }, [props.song]);
+  }, [props.song.id]);
   const changeSemiTones = (ev: number) => {
     updateSong(props.song, ev);
   };
+
+  const addToList = (ev: React.MouseEvent) => {
+    ev.preventDefault();
+    ev.stopPropagation();
+    addSongRight(songItem);
+  };
+
   return (
     <div className="song page-break" ref={textRef}>
       <div className="song__title">
@@ -57,15 +65,26 @@ export const SongView: React.FC<{
           ></TransposeControl>
         )}
         {songItem && <h3>{songItem.title}</h3>}
-        <Tooltip title="Podziel na dwie kolumny" arrow>
-          <IconButton
-            onClick={() => setIsOverflowing(!isOverflowing)}
-            aria-label="split"
-            color="primary"
-          >
-            <VerticalSplitIcon />
-          </IconButton>
-        </Tooltip>
+        {!props.isPrintMode && (
+          <Tooltip title="Podziel na dwie kolumny" arrow>
+            <IconButton
+              onClick={() => setIsOverflowing(!isOverflowing)}
+              aria-label="split"
+              color="primary"
+            >
+              <VerticalSplitIcon />
+            </IconButton>
+          </Tooltip>
+        )}
+        <IconButton
+          sx={{ padding: 0.5 }}
+          className={props.song.added ? "hidden" : ""}
+          onClick={addToList}
+          color="secondary"
+          aria-label="add an alarm"
+        >
+          <AddIcon />
+        </IconButton>
       </div>
       <div className="song__items" style={columnCountStyle}>
         {songArr &&

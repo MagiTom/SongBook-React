@@ -16,13 +16,12 @@ import {
 import Button from "@mui/material/Button";
 import React, { useEffect } from "react";
 import { Category } from "../../constans/categories";
-import { SongPageItem, SongToAdd } from "../../constans/songList";
 import { useSongListContext } from "../../context/SongListContext";
 import { useSongsDbContext } from "../../context/firebaseContext";
+import { SongToAddLeft } from "../../models/SongListLeft.model";
+import { SongListRight } from "../../models/SongListRight.model";
 import AlertDialog from "../AlertDialog/AlertDialog";
 import "./style.scss";
-import { SongListRight } from "../../models/SongListRight.model";
-import { SongToAddLeft } from "../../models/SongListLeft.model";
 
 export type SongProps = {
   song?: SongListRight;

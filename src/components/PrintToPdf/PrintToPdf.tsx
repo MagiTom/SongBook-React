@@ -10,7 +10,7 @@ const PrintToPdf: React.FC<{ songs: SongListRight[] }> = ({ songs }) => {
   const contentToPrint = songs?.map((song) => (
     <SongView
       key={song.id}
-      song={song}
+      song={{...song, added: true}}
       id={song.id}
       isPrintMode={true}
     />

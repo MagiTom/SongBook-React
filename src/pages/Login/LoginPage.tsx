@@ -1,3 +1,6 @@
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+import EmailIcon from "@mui/icons-material/Email";
+import KeyIcon from "@mui/icons-material/Key";
 import {
   Box,
   Button,
@@ -6,17 +9,13 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import "./style.scss";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { signInWithEmailAndPassword, signOut } from "firebase/auth";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useErrorContext } from "../../context/ErrorContext";
 import { useSongsDbContext } from "../../context/firebaseContext";
-import { useEffect, useRef, useState } from "react";
-import React from "react";
-import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { auth } from "../../firebase-config";
-import KeyIcon from "@mui/icons-material/Key";
-import EmailIcon from "@mui/icons-material/Email";
+import "./style.scss";
 
 export const LoginPage = () => {
   const [open, setOpen] = React.useState(false);
@@ -56,10 +55,6 @@ export const LoginPage = () => {
           addError(error?.message);
         });
     }
-  };
-
-  const handleClickOpen = () => {
-    setOpen(true);
   };
 
   const handleClose = () => {

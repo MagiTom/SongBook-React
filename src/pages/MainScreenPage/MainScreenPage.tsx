@@ -4,7 +4,7 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import MenuIcon from "@mui/icons-material/Menu";
 import MusicNoteIcon from "@mui/icons-material/MusicNote";
-import { Button, ListItem, useMediaQuery } from "@mui/material";
+import { Button, LinearProgress, ListItem, useMediaQuery } from "@mui/material";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -24,13 +24,14 @@ import {
 import { User, onAuthStateChanged, signOut } from "firebase/auth";
 import * as React from "react";
 import { useEffect, useState } from "react";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 import { initDB } from "react-indexed-db-hook";
 import { Outlet, useNavigate } from "react-router-dom";
 import AddSongDialog from "../../components/AddSongDialog/AddSongDialog";
 import ErrorModal from "../../components/ErrorModal/ErrorModal";
-import LoginDialog from "../../components/LoginDialog/LoginDialog";
-import { NavListItem } from "../../components/NavListItem/NavListItem";
 import { NavItemDrag } from "../../components/NavItemDrag/NavItemDrag";
+import { NavListItem } from "../../components/NavListItem/NavListItem";
 import PrintToPdf from "../../components/PrintToPdf/PrintToPdf";
 import { useErrorContext } from "../../context/ErrorContext";
 import { useSongListContext } from "../../context/SongListContext";
@@ -40,9 +41,6 @@ import { DBConfig } from "../../lib/DBConfig";
 import { SongListLeft } from "../../models/SongListLeft.model";
 import { SongListRight } from "../../models/SongListRight.model";
 import "./style.scss";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
-import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 
 type ModeType = "light" | "dark";
 
@@ -122,14 +120,13 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 export default function PersistentDrawerLeft() {
   const theme = useTheme();
   const {
-    songItemList,
     setSelectedIndex,
     selectedIndex,
   } = useSongListContext();
   const [open1, setOpen1] = useState<boolean>(true);
   const [open2, setOpen2] = useState<boolean>(true);
   const [user, setUser] = useState<User | null>();
-  const { getCategoriesDb } = useSongsDbContext();
+  const { getCategoriesDb, loading } = useSongsDbContext();
   const {
     getSongListAdmin,
     addSongRight,
@@ -142,8 +139,6 @@ export default function PersistentDrawerLeft() {
   const [currentMode, setCurrentMode] = React.useState<ModeType>("light"); // Track the current mode
   const navigate = useNavigate();
   const matches = useMediaQuery("(max-width: 480px)");
-
-  console.log("songItemList", songItemList);
 
   useEffect(() => {
     const mode: ModeType = localStorage.getItem("currentMode") as ModeType;
@@ -208,8 +203,6 @@ export default function PersistentDrawerLeft() {
       });
   };
   const moveSong = (fromIndex: any, toIndex: any) => {
-    console.log("fromIndex", fromIndex);
-    console.log("toIndex", toIndex);
     updateChoosenSongList(fromIndex, toIndex);
   };
 
@@ -334,6 +327,7 @@ export default function PersistentDrawerLeft() {
               <MenuIcon />
             </IconButton>
           </Toolbar>
+          {loading && <LinearProgress color="success" />}
         </AppBar>
 
         <Drawer

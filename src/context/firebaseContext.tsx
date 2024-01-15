@@ -1,25 +1,25 @@
 
+import firebase from "firebase/compat/app";
 import React, { useContext, useState } from "react";
 import { Category } from "../constans/categories";
 import {
   SongPageItem,
 } from "../constans/songList";
 import { db } from "../firebase-config";
-import { useErrorContext } from "./ErrorContext";
-import firebase from "firebase/compat/app";
 import {
   SongListLeft,
   SongToAddLeft,
 } from "../models/SongListLeft.model";
 import { SongListRight } from "../models/SongListRight.model";
+import { useErrorContext } from "./ErrorContext";
 
 export interface User {
   email: string;
 }
 
 export interface SongsDbModel {
-  // songListDb: SongListLeft[] | undefined;
   categoriesDb: Category[];
+  loading: boolean;
   addSongDb: (song: SongToAddLeft) => Promise<string>;
   getSongDb: (id: string) => Promise<SongListLeft | any>;
   deleteSongDb: (song: SongListLeft) => Promise<void>;
@@ -38,8 +38,8 @@ export interface SongsDbModel {
 }
 
 const SongsDbContext = React.createContext<SongsDbModel>({
-  // songListDb: [],
   categoriesDb: [],
+  loading: false,
   addSongDb: () => Promise.resolve(''),
   getSongDb: () => Promise.resolve(null),
   deleteSongDb: () => Promise.resolve(),
@@ -58,13 +58,14 @@ const SongsDbContext = React.createContext<SongsDbModel>({
 });
 
 export const SongsDbProvider: React.FC<any> = ({ children }) => {
-  // const [songListDb, setSongListDb] = useState<SongListItem[] | undefined>();
   const [categoriesDb, setCategoriesDb] = useState<Category[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
   const { addError } = useErrorContext();
   const user = firebase.auth().currentUser;
 
   const createUserDocument = async (user: any) => {
     if (user) {
+      setLoading(true);
       const userRef = db.collection("users").doc(user.uid);
       const doc = await userRef.get();
       if (!doc.exists) {
@@ -72,25 +73,29 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
           email: user.email,
         });
       }
+      setLoading(false);
     }
   };
 
   const getListDb = async (collection: string): Promise<any> => {
     const userAuth = firebase.auth().currentUser;
     if (userAuth) {
+      setLoading(true);
       const userRef = db.collection("users").doc(userAuth.uid);
       try {
         const doc = await userRef.get();
         if (doc.exists) {
           const userData = doc.data();
           const listCol = userData?.[collection] || [];
+          setLoading(false);
           return listCol;
         } else {
+          setLoading(false);
           throw ('Dokument użytkownika nie istnieje.')
         }
       } catch (error) {
-        console.error("Błąd podczas pobierania danych użytkownika:", error);
         addError(error);
+        setLoading(false);
         throw error;
       }
     }
@@ -99,25 +104,23 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
  const updateListDb = async (newList: any[], collection: string) =>{
   const userAuth = firebase.auth().currentUser;
   if (userAuth) {
+    setLoading(true);
     const userRef = db.collection("users").doc(userAuth.uid);
     try {
       const doc = await userRef.get();
       if (doc.exists) {
-        // Pobierz dane użytkownika
         const userData = doc.data();
         if(userData){
-        // Zaktualizuj listę danych
         userData[collection] = newList;
-
-        // Zaktualizuj dokument użytkownika na Firebase
         await userRef.update(userData);
         }
-
+        setLoading(false);
       } else {
+        setLoading(false);
         throw 'Dokument użytkownika nie istnieje.';
       }
     } catch (error) {
-      console.error("Błąd podczas aktualizowania danych użytkownika:", error);
+      setLoading(false);
       addError(error);
       throw error;
     }
@@ -126,15 +129,17 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
 
   const addElementToDb = async (element: any, collection: string): Promise<any> => {
     try {
+      setLoading(true);
       const userRef = firebase.firestore().collection("users").doc(user?.uid);
       const newId = element?.id || userRef.collection(collection).doc().id;
       const updateEl = { ...element, id: newId };
       await userRef.update({
         [collection]: firebase.firestore.FieldValue.arrayUnion(updateEl),
       });
+      setLoading(false);
       return updateEl;
     } catch (error) {
-      console.error("Błąd podczas dodawania piosenki dla użytkownika:", error);
+      setLoading(false);
       addError(error);
       throw error;
     }
@@ -145,13 +150,14 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
     collection: string
   ): Promise<void> => {
     try {
-      console.log("element", element);
+      setLoading(true);
       const userRef = firebase.firestore().collection("users").doc(user?.uid);
       await userRef.update({
         [collection]: firebase.firestore.FieldValue.arrayRemove(element),
       });
+      setLoading(false);
     } catch (error) {
-      console.error("Błąd podczas usuwania piosenki:", error);
+      setLoading(false);
       addError(error);
       throw error;
     }
@@ -161,6 +167,7 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
     element: any,
     collection: string
   ): Promise<void> => {
+    setLoading(true);
     const userRef = firebase.firestore().collection("users").doc(user?.uid);
     const userSnapshot = await userRef.get();
     if (userSnapshot.exists) {
@@ -176,11 +183,14 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
         await userRef.update({
           [collection]: userElements,
         });
+        setLoading(false);
       } else {
+        setLoading(false);
         addError("Nie znaleziono piosenki o podanym ID.");
         throw "Nie znaleziono piosenki o podanym ID.";
       }
     } else {
+      setLoading(false);
       addError("Użytkownik nie istnieje lub nie ma piosenek.");
       throw "Użytkownik nie istnieje lub nie ma piosenek.";
     }
@@ -229,6 +239,7 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
 
   const getSongDb = async (id: string) => {
     try {
+      setLoading(true);
       const userRef = firebase
         .firestore()
         .collection("users")
@@ -236,16 +247,16 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
         .collection("songs")
         .doc(id);
       const userSnapshot = await userRef.get();
-
       if (userSnapshot.exists) {
         const text = userSnapshot.data();
-        console.log("Pełny tekst piosenki:", text);
+        setLoading(false);
         return text;
       } else {
+        setLoading(false);
         console.log("Nie znaleziono użytkownika.");
       }
     } catch (error) {
-      console.error("Błąd podczas pobierania tekstu piosenki:", error);
+      setLoading(false);
       addError(error);
     }
   };
@@ -273,6 +284,7 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
 
   const addSongTextToUser = async (song: SongListLeft): Promise<string> => {
     try {
+      setLoading(true);
       const userRef = firebase
         .firestore()
         .collection("users")
@@ -285,14 +297,10 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
         title: song.title,
         category: song.category,
       });
+      setLoading(false);
       return song.id;
-
-      console.log("Pełny tekst piosenki został dodany dla użytkownika.");
     } catch (error) {
-      console.error(
-        "Błąd podczas dodawania pełnego tekstu piosenki dla użytkownika:",
-        error
-      );
+      setLoading(false);
       throw error;
     }
   };
@@ -302,12 +310,12 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
       await deleteElementDb(song, "songs");
       await deleteSongTextFromUser(song.id);
     } catch (error) {
-      console.error("Błąd podczas usuwania piosenki:", error);
       addError(error);
     }
   };
   const deleteSongTextFromUser = async (docId: string) => {
     if (user) {
+      setLoading(true);
       try {
         const userSongRef = firebase
           .firestore()
@@ -315,15 +323,10 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
           .doc(user.uid)
           .collection("songs")
           .doc(docId);
-
         await userSongRef.delete();
-
-        console.log("Pełny tekst piosenki został pomyślnie usunięty.");
+        setLoading(false);
       } catch (error) {
-        console.error(
-          "Błąd podczas usuwania pełnego tekstu piosenki dla użytkownika:",
-          error
-        );
+        setLoading(false);
         addError(error);
       }
     }
@@ -346,6 +349,7 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
 
   const updateSongTextForUser = async (song: SongListRight) => {
     try {
+      setLoading(true);
       const userRef = firebase
         .firestore()
         .collection("users")
@@ -356,13 +360,10 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
       await userRef.update({
         ...song,
       });
-
-      console.log("Tekst piosenki został zaktualizowany dla użytkownika.");
+      setLoading(false);
     } catch (error) {
-      console.error(
-        "Błąd podczas aktualizacji tekstu piosenki dla użytkownika:",
-        error
-      );
+      setLoading(false);
+      addError(error);
     }
   };
 
@@ -384,7 +385,8 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
         getSongListDb,
         getSongDb,
         updateSemitones,
-        updateChoosenListDb
+        updateChoosenListDb,
+        loading
       }}
     >
       {children}

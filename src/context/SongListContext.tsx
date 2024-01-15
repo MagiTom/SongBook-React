@@ -52,7 +52,6 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
       }
       return el;
     });
-    console.log("updateLeft", updateLeft);
     setSongListLeft([...updateLeft]);
   };
 
@@ -104,9 +103,6 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
             semitones: song.semitones,
           };
         });
-        console.log("updatedChoosenList", updatedChoosenList);
-        console.log("songs", songs);
-        console.log("res", res);
         setSongListLeft(updatedChoosenList || []);
         setSongListRight(songs);
       });
@@ -140,8 +136,7 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
   }
 
   function removeSongRight(song: SongListRight) {
-    deleteChoosenDb(song).then((res) => {
-      console.log("idddd remove", song);
+    deleteChoosenDb(song).then(() => {
       deleteSongFromRight(song.id);
       updateAddedValue(song.id, false);
     });
@@ -152,7 +147,6 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
     });
   }
   async function editSong(song: SongListRight, semitones: number) {
-    console.log("songToedit", song);
     const checkIfInRight = songListRight.find((el) => el.id === song.id);
     await updateSongDb(song, semitones);
     if (checkIfInRight) {
@@ -161,7 +155,6 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
     updateSongLists(song, semitones);
   }
   async function updateSong(song: SongListRight, semitones: number) {
-    console.log("songToedit", song);
     await updateSemitones(song, semitones);
     updateLeft(song, semitones);
   }

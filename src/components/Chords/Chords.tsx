@@ -75,7 +75,6 @@ export const Chords: React.FC<any> = ({ children }) => {
             >
               <ChordDisplay
                 chord={getChordByName(chord)}
-                // {/* chord={Chords.C} */}
               />
             </div>
           )}
