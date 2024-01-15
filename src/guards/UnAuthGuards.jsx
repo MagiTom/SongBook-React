@@ -11,6 +11,7 @@ const UnAuthGuard = ({ component }) => {
         onAuthStateChanged(auth, (user) => {
             checkToken(user);
           });
+          // eslint-disable-next-line
     }, [component]);
 
     const checkToken = async (user) => {

@@ -44,7 +44,7 @@ export const SongView: React.FC<{
       }
     }
     setSongArr(arr);
-  }, [props.song.id]);
+  }, [props.song]);
   const changeSemiTones = (ev: number) => {
     updateSong(props.song, ev);
   };

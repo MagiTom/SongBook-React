@@ -91,6 +91,7 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
           return listCol;
         } else {
           setLoading(false);
+          // eslint-disable-next-line
           throw ('Dokument użytkownika nie istnieje.')
         }
       } catch (error) {
@@ -117,6 +118,7 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
         setLoading(false);
       } else {
         setLoading(false);
+        // eslint-disable-next-line
         throw 'Dokument użytkownika nie istnieje.';
       }
     } catch (error) {
@@ -187,11 +189,13 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
       } else {
         setLoading(false);
         addError("Nie znaleziono piosenki o podanym ID.");
+        // eslint-disable-next-line
         throw "Nie znaleziono piosenki o podanym ID.";
       }
     } else {
       setLoading(false);
       addError("Użytkownik nie istnieje lub nie ma piosenek.");
+      // eslint-disable-next-line
       throw "Użytkownik nie istnieje lub nie ma piosenek.";
     }
   };

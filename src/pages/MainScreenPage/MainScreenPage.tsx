@@ -156,7 +156,7 @@ export default function PersistentDrawerLeft() {
       getSongListAdmin();
       getCategoriesDb();
     });
-  }, [user]);
+  }, [user, getCategoriesDb, getSongListAdmin]);
 
   const handleDrawerOpen = (drawer: NavDraver) => {
     if (drawer === "drawer1") {

@@ -9,7 +9,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useErrorContext } from "../../context/ErrorContext";
@@ -59,15 +59,6 @@ export const LoginPage = () => {
 
   const handleClose = () => {
     setOpen(false);
-  };
-  const handleLogOut = () => {
-    signOut(auth)
-      .then(() => {
-        navigate("/");
-      })
-      .catch(() => {
-        // An error happened.
-      });
   };
   function handleKeyPress(event: React.KeyboardEvent<HTMLDivElement>) {
     const key = event.key;

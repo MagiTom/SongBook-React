@@ -49,7 +49,7 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
       setText(prop.song.text);
       setCategory(prop.song.category);
     }
-  }, [prop.song?.id, prop.song?.category, prop.song?.text, prop.song?.title]);
+  }, [prop.song]);
 
   const handleClickOpen = () => {
     setOpen(true);
