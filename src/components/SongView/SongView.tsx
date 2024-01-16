@@ -20,12 +20,21 @@ export const SongView: React.FC<{
   const [songItem, setSongItem] = useState<SongListRight>();
   const { updateSong, addSongRight } = useSongListContext();
   const { semitones } = useTransposeContext();
-  const [isOverflowing, setIsOverflowing] = useState(false);
+  const [overflowing, setOverflowing] = useState<number>(1);
   const textRef = useRef<any>(null);
 
-  const columnCountStyle = isOverflowing
-    ? { columnCount: 2 }
-    : { columnCount: 1 };
+   const getColumnStyle = () => {
+      return {
+        columnCount: overflowing,
+      }
+   }
+   const setColumns = () => {
+    if(overflowing === 3){
+      setOverflowing(1);
+      return;
+    }
+      setOverflowing(overflowing + 1);
+   }
 
   useEffect(() => {
     const songItemEl: any = { ...props.song };
@@ -68,7 +77,7 @@ export const SongView: React.FC<{
         {!props.isPrintMode && (
           <Tooltip title="Podziel na dwie kolumny" arrow>
             <IconButton
-              onClick={() => setIsOverflowing(!isOverflowing)}
+              onClick={() => setColumns()}
               aria-label="split"
               color="primary"
             >
@@ -86,7 +95,7 @@ export const SongView: React.FC<{
           <AddIcon />
         </IconButton>
       </div>
-      <div className="song__items" style={columnCountStyle}>
+      <div className="song__items fill" style={getColumnStyle()}>
         {songArr &&
           songArr.map((songEl, index) => (
             <div className="song__item" key={songEl + index}>

@@ -375,7 +375,7 @@ export default function PersistentDrawerLeft() {
           <PrintToPdf songs={songListRight}></PrintToPdf>
         </Drawer>
 
-        <Main open1={open1} open2={open2}>
+        <Main sx={{pt: '0.5em'}} open1={open1} open2={open2}>
           <DrawerHeader />
           <Outlet />
         </Main>

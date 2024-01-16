@@ -3,6 +3,7 @@
     cursor: pointer;
     font-size: .9rem;
     line-height: .9rem;
+    break-after: avoid;
 }
 
 @media (max-width: 480px) {

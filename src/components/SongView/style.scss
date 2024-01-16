@@ -12,8 +12,10 @@
     }
     &__item{
        width: fit-content;
+       column-fill: auto;
     }
 }
+
 
 @media (max-width: 480px) {
     .song{
