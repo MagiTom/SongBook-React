@@ -102,7 +102,7 @@ export const SongView: React.FC<{
               {(index % 2 === 0 || songEl.includes("/")) && (
                 <Chords>{songEl}</Chords>
               )}
-              {/* {songEl.trim() === "" && index % 2 !== 0 && <br />} */}
+              {songEl.trim() === "" && index % 2 !== 0 && <br />}
               {index % 2 !== 0 && !songEl.includes("/") && (
                 <Lyrics>{songEl}</Lyrics>
               )}

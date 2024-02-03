@@ -29,11 +29,11 @@ export const Chords: React.FC<any> = ({ children }) => {
   const chordsArr = (): string[] => {
     const result: any[] = [];
     const array = Array.from(chords);
-
+  
     for (let i = 0; i < array.length; i++) {
       if (array[i]?.trim() && array[i + 1]?.trim()) {
         const el = `${array[i].trim()}${array[i + 1].trim()}${
-          array[i + 2] ? array[i + 2] : ""
+          array[i + 2] ? array[i + 2].trim() : ""
         }`;
         const newEl = transposeChord(el);
         result.push(newEl);
