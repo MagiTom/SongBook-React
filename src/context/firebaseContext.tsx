@@ -276,7 +276,7 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
       const el = await addElementToDb(songToAdd, "songs");
       const id: string = el.id;
       
-      addSongTextToUser({ ...songToAdd, text: song.text, id });
+      addSongTextToUser({ ...songToAdd, text: song.text, link: song.link, id });
       
       return id;
     } catch (error) {
@@ -300,6 +300,7 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
         text: song.text,
         title: song.title,
         category: song.category,
+        link: song?.link
       });
       setLoading(false);
       return song.id;

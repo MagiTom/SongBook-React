@@ -33,6 +33,7 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
   const [submitted, setSubmitted] = React.useState(false);
   const [title, setTitle] = React.useState<string>("");
   const [text, setText] = React.useState<string>("");
+  const [link, setLink] = React.useState<string | undefined>("");
   const [category, setCategory] = React.useState<string>("");
   const [newCategory, setNewCategory] = React.useState<string>("");
   const [editMode, setEditMode] = React.useState<boolean>(false);
@@ -47,6 +48,7 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
       setEditMode(true);
       setTitle(prop.song?.title);
       setText(prop.song.text);
+      setLink(prop.song.link)
       setCategory(prop.song.category);
     }
   }, [prop.song]);
@@ -66,7 +68,8 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
         title,
         category,
         text,
-        semitones: prop.semitones
+        semitones: prop.semitones,
+        link
       };
       addSongListLeft(songToAdd);
       clearData();
@@ -79,6 +82,7 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
       title,
       category,
       text,
+      link,
       id: prop.song?.id || ''
     };
     editSong(songToAdd, prop.semitones);
@@ -143,7 +147,7 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
 
           <div className="category">
             <FormControl fullWidth error={submitted && !category}>
-              <InputLabel id="demo-simple-select-label">kategoria</InputLabel>
+              <InputLabel id="demo-simple-select-label">kategoria*</InputLabel>
               <Select
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
@@ -190,7 +194,7 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
             className="inputText"
             fullWidth
             variant="standard"
-            label="tytuł"
+            label="tytuł*"
             margin="dense"
             id="title"
             value={title}
@@ -204,7 +208,7 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
             className="inputText"
             margin="dense"
             id="text"
-            label="tekst"
+            label="tekst*"
             error={submitted && !text}
             helperText={submitted && !text ? "Podaj tekst!" : ""}
             value={text}
@@ -213,6 +217,19 @@ const AddSongDialog: React.FC<SongProps> = (prop) => {
             variant="standard"
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               setText(event.target.value);
+            }}
+          />
+            <TextField
+            className="inputText"
+            fullWidth
+            variant="standard"
+            label="link"
+            margin="dense"
+            id="link"
+            value={link}
+            helperText={"(opcjonalnie)"}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              setLink(event.target.value);
             }}
           />
         </DialogContent>

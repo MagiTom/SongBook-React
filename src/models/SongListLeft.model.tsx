@@ -7,7 +7,8 @@ export interface SongToAddLeft {
     category: string,
     text?: string,
     semitones: number,
-    added?: boolean;
+    added?: boolean,
+    link?: string
 }
 
 export interface SongTextItem{

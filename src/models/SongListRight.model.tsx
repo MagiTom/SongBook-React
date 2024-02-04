@@ -5,4 +5,5 @@ export interface SongListRight {
     title: string,
     category: string,
     text: string,
+    link?: string
 }

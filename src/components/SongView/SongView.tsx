@@ -10,6 +10,7 @@ import { IconButton, Tooltip } from "@mui/material";
 import VerticalSplitIcon from "@mui/icons-material/VerticalSplit";
 import AddIcon from "@mui/icons-material/Add";
 import { SongViewItem } from "../../pages/SongPage/SongPage";
+import YouTubeIcon from '@mui/icons-material/YouTube';
 
 export const SongView: React.FC<{
   song: SongViewItem;
@@ -64,6 +65,10 @@ export const SongView: React.FC<{
     addSongRight(songItem);
   };
 
+  const openInNewTab = () => {
+    window.open(songItem?.link, "_blank", "noreferrer");
+  };
+
   return (
     <div className="song page-break" ref={textRef}>
       <div className="song__title">
@@ -109,6 +114,9 @@ export const SongView: React.FC<{
             </div>
           ))}
       </div>
+      {songItem?.link && <div className="song__link">
+      <YouTubeIcon style={{ fontSize: 60, color: 'red' }} onClick={openInNewTab}></YouTubeIcon>
+      </div>}
     </div>
   );
 };
