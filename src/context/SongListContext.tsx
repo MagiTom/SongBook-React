@@ -34,8 +34,8 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
   }
 
   function updateSongLists(song: SongListRight, semitones: number) {
-    updateRight(song);
     updateLeft(song, semitones);
+    updateRight(song);
   }
 
   const updateLeft = (song: SongListRight, semitones: number) => {
@@ -151,8 +151,9 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
     await updateSongDb(song, semitones);
     if (checkIfInRight) {
       await updateChoosenDb(song);
+      updateRight(song);
     }
-    updateSongLists(song, semitones);
+    updateLeft(song, semitones);
   }
   async function updateSong(song: SongListRight, semitones: number) {
     await updateSemitones(song, semitones);
